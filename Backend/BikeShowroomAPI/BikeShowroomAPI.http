@@ -1,0 +1,6 @@
+@BikeShowroomAPI_HostAddress = http://localhost:5018
+
+GET {{BikeShowroomAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

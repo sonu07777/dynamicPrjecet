@@ -38,7 +38,7 @@ function AppContent() {
             <ProtectedRoute>
               <div className="flex min-h-screen bg-gray-100">
                 <Navbar />
-                <main className="flex-1 min-h-screen overflow-y-auto">
+                <main className="flex-1 min-h-screen overflow-y-auto md:ml-0 transition-all duration-300">
                   <Routes>
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
 

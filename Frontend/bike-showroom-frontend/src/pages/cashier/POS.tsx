@@ -44,16 +44,20 @@ const POS = () => {
   const tax = () => (subTotal() - discount()) * 0.1;
   const total = () => subTotal() - discount() + tax();
   const change = () => Math.max(0, amountReceived - total());
+  console.log("user is " + user?.branchId);
 
   const handleCompleteSale = async () => {
     if (!cart.length) { message.warning('Cart is empty'); return; }
-    if (!user?.branchId || !user?.companyId) { message.warning('Branch/company info missing'); return; }
+    // if (!user?.branchId || !user?.companyId) { message.warning('Branch/company info missing'); return; }
+    if (!user?.companyId) { message.warning('Branch/company info missing'); return; }
     if (amountReceived < total() && paymentMethod === 'Cash') { message.error('Insufficient amount'); return; }
     setSubmitting(true);
     try {
       const t = total();
       await createSale({
-        companyId: user.companyId, branchId: user.branchId, customerId: null,
+        companyId:Number(user.companyId),
+        branchId: Number(user.branchId),
+        customerId: null,
         subTotal: subTotal(), taxAmount: tax(), discountAmount: discount(), totalAmount: t,
         paymentMethod, paymentStatus: 'Paid', amountPaid: paymentMethod === 'Cash' ? amountReceived : t, amountDue: 0,
         notes: customerName ? `Customer: ${customerName}` : null,

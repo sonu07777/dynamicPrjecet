@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 using BikeShowroomAPI.Data;
 using BikeShowroomAPI.Filters;
@@ -18,6 +19,12 @@ builder.Services.AddControllers(options =>
     // Automatically record an audit event for every successful write (POST/PUT/DELETE)
     // by forwarding it to the AuditLogService microservice.
     options.Filters.Add<AuditActionFilter>();
+})
+.AddJsonOptions(options =>
+{
+    // Prevent "possible object cycle detected" errors when serializing EF Core
+    // entities with circular navigation properties (e.g. Sale <-> SaleItem).
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();

@@ -40,7 +40,7 @@ const Dashboard = () => {
             title="Today's Sales"
             value={stats?.todayRevenue ?? 0}
             precision={2}
-            prefix="$"
+            prefix="₹"
             suffix={<Text type="secondary" style={{ fontSize: 12 }}> / {stats?.todaySales || 0} transactions</Text>}
           />
         </Card>
@@ -81,8 +81,8 @@ const Dashboard = () => {
         <Card title="Monthly Overview" className="shadow-md">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <Statistic title="Monthly Sales" value={stats?.monthSales ?? 0} />
-            <Statistic title="Monthly Revenue" value={stats?.monthRevenue ?? 0} precision={2} prefix="$" />
-            <Statistic title="Average Sale" value={stats?.averageSale ?? 0} precision={2} prefix="$" />
+            <Statistic title="Monthly Revenue" value={stats?.monthRevenue ?? 0} precision={2} prefix="₹" />
+            <Statistic title="Average Sale" value={stats?.averageSale ?? 0} precision={2} prefix="₹" />
           </div>
         </Card>
       </div>

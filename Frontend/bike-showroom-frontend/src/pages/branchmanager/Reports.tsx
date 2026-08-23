@@ -61,7 +61,7 @@ const Reports = () => {
       type: 'value' as const,
       axisLabel: {
         color: '#666',
-        formatter: (v: number) => `$${v.toFixed(0)}`,
+        formatter: (v: number) => `₹₹{v.toFixed(0)}`,
       },
       splitLine: { lineStyle: { color: '#f0f0f0' } },
     },
@@ -75,7 +75,7 @@ const Reports = () => {
       label: {
         show: true,
         position: 'top' as const,
-        formatter: (p: any) => `$${(p.value as number).toFixed(0)}`,
+        formatter: (p: any) => `₹₹{(p.value as number).toFixed(0)}`,
         color: '#333',
         fontWeight: 'bold' as const,
       },
@@ -86,7 +86,7 @@ const Reports = () => {
   const paymentOption = useMemo(() => ({
     tooltip: {
       trigger: 'item' as const,
-      formatter: (p: any) => `${p.name}: $${p.value.toFixed(2)}`,
+      formatter: (p: any) => `₹{p.name}: ₹₹{p.value.toFixed(2)}`,
     },
     series: [{
       type: 'pie' as const,
@@ -96,7 +96,7 @@ const Reports = () => {
       itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 },
       label: {
         show: true,
-        formatter: '{b}: ${c}',
+        formatter: '{b}: ₹{c}',
         color: '#666',
         fontSize: 12,
       },
@@ -110,7 +110,7 @@ const Reports = () => {
       trigger: 'axis' as const,
       formatter: (p: any) => {
         const item = p[0];
-        return `${item.axisValue}<br/>Revenue: $${(item.value as number).toFixed(2)}`;
+        return `₹{item.axisValue}<br/>Revenue: ₹₹{(item.value as number).toFixed(2)}`;
       },
     },
     grid: { left: 50, right: 20, top: 30, bottom: 40 },
@@ -124,7 +124,7 @@ const Reports = () => {
       type: 'value' as const,
       axisLabel: {
         color: '#666',
-        formatter: (v: number) => `$${v.toFixed(0)}`,
+        formatter: (v: number) => `₹₹{v.toFixed(0)}`,
       },
       splitLine: { lineStyle: { color: '#f0f0f0' } },
     },
@@ -146,7 +146,7 @@ const Reports = () => {
       itemStyle: { color: '#667eea' },
       label: {
         show: salesTrendData.dates.length <= 7,
-        formatter: (p: any) => `$${(p.value as number).toFixed(0)}`,
+        formatter: (p: any) => `₹₹{(p.value as number).toFixed(0)}`,
         color: '#667eea',
         fontSize: 11,
       },
@@ -170,19 +170,19 @@ const Reports = () => {
   }), [products.length, lowStock.length]);
 
   const statCards = [
-    { icon: '💰', label: "Today's Revenue", value: stats?.todayRevenue ?? 0, sub: `${stats?.todaySales || 0} sales today`, prefix: '$', precision: 2 },
-    { icon: '📈', label: 'Monthly Revenue', value: stats?.monthRevenue ?? 0, sub: `${stats?.monthSales || 0} sales this month`, prefix: '$', precision: 2 },
+    { icon: '💰', label: "Today's Revenue", value: stats?.todayRevenue ?? 0, sub: `₹{stats?.todaySales || 0} sales today`, prefix: '₹', precision: 2 },
+    { icon: '📈', label: 'Monthly Revenue', value: stats?.monthRevenue ?? 0, sub: `₹{stats?.monthSales || 0} sales this month`, prefix: '₹', precision: 2 },
     { icon: '📦', label: 'Products', value: products.length, sub: 'Total products', precision: 0 },
     { icon: '⚠️', label: 'Low Stock Items', value: lowStock.length, sub: 'Need reorder', precision: 0 },
     { icon: '👥', label: 'Customers', value: customers.length, sub: 'Registered', precision: 0 },
-    { icon: '📊', label: 'Average Sale', value: stats?.averageSale ?? 0, sub: 'Per transaction', prefix: '$', precision: 2 },
+    { icon: '📊', label: 'Average Sale', value: stats?.averageSale ?? 0, sub: 'Per transaction', prefix: '₹', precision: 2 },
   ];
 
   const saleColumns = [
     { title: 'Invoice #', dataIndex: 'invoiceNumber', key: 'invoiceNumber', render: (v: string) => <strong>{v}</strong> },
     { title: 'Date', dataIndex: 'saleDate', key: 'saleDate', render: (v: string) => new Date(v).toLocaleDateString() },
     { title: 'Items', key: 'items', render: (_: unknown, r: any) => r.items?.length || 0 },
-    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => `$${v?.toFixed(2)}` },
+    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => `₹₹{v?.toFixed(2)}` },
     { title: 'Payment', dataIndex: 'paymentMethod', key: 'paymentMethod' },
     {
       title: 'Status',

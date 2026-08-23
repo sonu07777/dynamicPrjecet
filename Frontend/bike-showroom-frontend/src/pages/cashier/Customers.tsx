@@ -115,8 +115,8 @@ const Customers = () => {
       key: 'customerType',
       render: (v: string) => <Tag color="green">{v}</Tag>,
     },
-    { title: 'Credit Limit', dataIndex: 'creditLimit', key: 'creditLimit', render: (v: number) => `$${v.toFixed(2)}` },
-    { title: 'Balance', dataIndex: 'currentBalance', key: 'currentBalance', render: (v: number) => `$${v.toFixed(2)}` },
+    { title: 'Credit Limit', dataIndex: 'creditLimit', key: 'creditLimit', render: (v: number) => `₹₹{v.toFixed(2)}` },
+    { title: 'Balance', dataIndex: 'currentBalance', key: 'currentBalance', render: (v: number) => `₹₹{v.toFixed(2)}` },
     {
       title: 'Actions',
       key: 'actions',
@@ -189,7 +189,7 @@ const Customers = () => {
               />
             </Form.Item>
             <Form.Item name="creditLimit" label="Credit Limit">
-              <InputNumber min={0} step={0.01} style={{ width: '100%' }} prefix="$" />
+              <InputNumber min={0} step={0.01} style={{ width: '100%' }} prefix="₹" />
             </Form.Item>
             <Form.Item name="address" label="Address">
               <Input placeholder="Address" />

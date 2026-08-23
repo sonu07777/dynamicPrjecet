@@ -122,34 +122,7 @@ const Navbar = () => {
           </svg>
         </button>
 
-        {/* Desktop Collapse Toggle (visible when expanded - on right edge) */}
-        {!collapsed && (
-          <button
-            onClick={() => setCollapsed(true)}
-            className="md:block hidden absolute -right-6 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all duration-200 border border-white/10 shadow-lg"
-            aria-label="Collapse sidebar"
-            title="Collapse sidebar"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M12 5L6 9L12 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        )}
-
-        {/* Desktop Expand Toggle (visible when collapsed - on right edge) */}
-        {collapsed && (
-          <button
-            onClick={() => setCollapsed(false)}
-            className="md:block hidden absolute -right-6 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-200 border border-white/20 shadow-lg"
-            aria-label="Expand sidebar"
-            title="Expand sidebar"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M6 5L12 9L6 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        )}
-
+        
         {/* User Profile */}
         <div className="flex items-center gap-3 px-4 py-4 border-b border-white/15 shrink-0 min-w-0">
           <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm uppercase shrink-0">
@@ -228,6 +201,32 @@ const Navbar = () => {
 
         {/* Spacer */}
         <div className="flex-1 shrink-0 min-h-0" />
+
+        {/* Collapse/Expand Toggle at Bottom */}
+        <div className="px-3 pb-3 shrink-0">
+          <Tooltip title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} placement="right" destroyTooltipOnHide>
+            <Button
+              type="text"
+              block
+              onClick={() => setCollapsed(!collapsed)}
+              className={`
+                !text-white hover:!text-white hover:!bg-white/10
+                !font-medium rounded-xl transition-all duration-200
+                ${collapsed ? '!h-11 !px-2 justify-center' : '!h-11 justify-between'}
+              `}
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="shrink-0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                {!collapsed ? (
+                  <path d="M12 5L6 9L12 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                ) : (
+                  <path d="M6 5L12 9L6 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                )}
+              </svg>
+              {!collapsed && <span className="ml-2">Collapse</span>}
+              {/* {collapsed && <span className="ml-2">Expand</span>} */}
+            </Button>
+          </Tooltip>
+        </div>
 
         {/* Logout Button */}
         <div className="px-3 py-4 border-t border-white/15 shrink-0">

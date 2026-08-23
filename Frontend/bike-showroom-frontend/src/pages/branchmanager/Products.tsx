@@ -153,8 +153,8 @@ const Products = () => {
     { title: 'SKU', dataIndex: 'sku', key: 'sku', render: (v: string) => <strong>{v}</strong> },
     { title: 'Name', dataIndex: 'name', key: 'name' },
     { title: 'Category', dataIndex: 'categoryName', key: 'categoryName' },
-    { title: 'Cost Price', dataIndex: 'costPrice', key: 'costPrice', render: (v: number) => `$${v.toFixed(2)}` },
-    { title: 'Sell Price', dataIndex: 'sellingPrice', key: 'sellingPrice', render: (v: number) => `$${v.toFixed(2)}` },
+    { title: 'Cost Price', dataIndex: 'costPrice', key: 'costPrice', render: (v: number) => `₹₹{v.toFixed(2)}` },
+    { title: 'Sell Price', dataIndex: 'sellingPrice', key: 'sellingPrice', render: (v: number) => `₹₹{v.toFixed(2)}` },
     { title: 'Unit', dataIndex: 'unit', key: 'unit' },
     {
       title: 'Actions',
@@ -250,14 +250,14 @@ const Products = () => {
               label="Cost Price"
               rules={[{ required: true, message: 'Please enter cost price' }]}
             >
-              <InputNumber min={0} step={0.01} style={{ width: '100%' }} prefix="$" />
+              <InputNumber min={0} step={0.01} style={{ width: '100%' }} prefix="₹" />
             </Form.Item>
             <Form.Item
               name="sellingPrice"
               label="Selling Price"
               rules={[{ required: true, message: 'Please enter selling price' }]}
             >
-              <InputNumber min={0} step={0.01} style={{ width: '100%' }} prefix="$" />
+              <InputNumber min={0} step={0.01} style={{ width: '100%' }} prefix="₹" />
             </Form.Item>
             <Form.Item name="unit" label="Unit">
               <Select

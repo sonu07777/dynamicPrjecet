@@ -5,7 +5,7 @@ namespace BikeShowroomAPI.Services;
 
 public interface IUserService
 {
-    Task<List<UserDTO>> GetUsersAsync(ClaimsPrincipal caller, int? companyId = null);
+    Task<List<UserDTO>> GetUsersAsync(ClaimsPrincipal caller, string? companyId = null);
     Task<UserDTO?> GetUserAsync(ClaimsPrincipal caller, string id);
     Task<ServiceResult<UserDTO>> CreateUserAsync(ClaimsPrincipal caller, RegisterDTO registerDto);
     Task<ServiceResult> UpdateUserRoleAsync(ClaimsPrincipal caller, string id, UpdateRoleDTO roleDto);

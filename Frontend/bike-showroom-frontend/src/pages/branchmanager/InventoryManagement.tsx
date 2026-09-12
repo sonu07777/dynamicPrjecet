@@ -10,9 +10,9 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface InventoryRow {
-  id: number;
-  productId: number;
-  branchId: number;
+  id: string;
+  productId: string;
+  branchId: string;
   quantity: number;
   reservedQuantity: number;
   availableQuantity: number;
@@ -24,7 +24,7 @@ const InventoryManagement = () => {
   const { user } = useAppSelector((state) => state.auth);
   const { message } = AntdApp.useApp();
 
-  const [selectedBranch, setSelectedBranch] = useState<number | undefined>();
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>();
   const [showAdjust, setShowAdjust] = useState(false);
   const [form] = Form.useForm();
 

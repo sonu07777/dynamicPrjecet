@@ -18,13 +18,13 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategories([FromQuery] int? companyId = null)
+    public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategories([FromQuery] string? companyId = null)
     {
         return Ok(await _categoryService.GetCategoriesAsync(companyId));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<CategoryDTO>> GetCategory(int id)
+    public async Task<ActionResult<CategoryDTO>> GetCategory(string id)
     {
         var category = await _categoryService.GetCategoryAsync(id);
         return category == null ? NotFound() : Ok(category);
@@ -43,7 +43,7 @@ public class CategoriesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin")]
-    public async Task<IActionResult> UpdateCategory(int id, CreateCategoryDTO dto)
+    public async Task<IActionResult> UpdateCategory(string id, CreateCategoryDTO dto)
     {
         var result = await _categoryService.UpdateCategoryAsync(id, dto);
         if (!result.Success)
@@ -54,7 +54,7 @@ public class CategoriesController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin")]
-    public async Task<IActionResult> DeleteCategory(int id)
+    public async Task<IActionResult> DeleteCategory(string id)
     {
         var result = await _categoryService.DeleteCategoryAsync(id);
         return result.Success ? NoContent() : NotFound();

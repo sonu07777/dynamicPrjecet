@@ -2,7 +2,7 @@ namespace BikeShowroomAPI.DTOs;
 
 public class CompanyDTO
 {
-    public int Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
@@ -31,8 +31,8 @@ public class CreateCompanyDTO
 
 public class BranchDTO
 {
-    public int Id { get; set; }
-    public int CompanyId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string CompanyId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
@@ -46,7 +46,7 @@ public class BranchDTO
 
 public class CreateBranchDTO
 {
-    public int CompanyId { get; set; }
+    public string CompanyId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;

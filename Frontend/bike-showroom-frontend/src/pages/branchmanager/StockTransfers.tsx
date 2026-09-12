@@ -10,19 +10,19 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface TransferRow {
-  id: number;
+  id: string;
   transferNumber: string;
-  fromBranchId: number;
-  toBranchId: number;
+  fromBranchId: string;
+  toBranchId: string;
   transferDate: string;
   status: string;
   fromBranchName?: string;
   toBranchName?: string;
-  items: { productId: number; productName?: string; quantity: number }[];
+  items: { productId: string; productName?: string; quantity: number }[];
 }
 
 interface StockTransferItem {
-  productId: number;
+  productId: string;
   productName?: string;
   quantity: number;
 }
@@ -42,7 +42,7 @@ const StockTransfers = () => {
   const [showForm, setShowForm] = useState(false);
   const [expandedTransfer, setExpandedTransfer] = useState<TransferRow | null>(null);
   const [form] = Form.useForm();
-  const [fromBranchId, setFromBranchId] = useState<number | undefined>();
+  const [fromBranchId, setFromBranchId] = useState<string | undefined>();
 
   const { data: transfers = [], isLoading } = useGetStockTransfersQuery(
     { companyId: user?.companyId, status: statusFilter || undefined },
@@ -81,7 +81,7 @@ const StockTransfers = () => {
     }
   };
 
-  const handleUpdateStatus = async (id: number, status: string) => {
+  const handleUpdateStatus = async (id: string, status: string) => {
     try {
       await updateStatus({ id, status }).unwrap();
       message.success(`Transfer marked as ${status}`);
@@ -90,7 +90,7 @@ const StockTransfers = () => {
     }
   };
 
-  const handleCancel = (id: number) => {
+  const handleCancel = (id: string) => {
     modal.confirm({
       title: 'Cancel this transfer?',
       okText: 'Cancel Transfer',

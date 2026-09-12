@@ -4,9 +4,9 @@ namespace BikeShowroomAPI.Services;
 
 public interface ICategoryService
 {
-    Task<List<CategoryDTO>> GetCategoriesAsync(int? companyId = null);
-    Task<CategoryDTO?> GetCategoryAsync(int id);
+    Task<List<CategoryDTO>> GetCategoriesAsync(string? companyId = null);
+    Task<CategoryDTO?> GetCategoryAsync(string id);
     Task<ServiceResult<CategoryDTO>> CreateCategoryAsync(CreateCategoryDTO dto);
-    Task<ServiceResult> UpdateCategoryAsync(int id, CreateCategoryDTO dto);
-    Task<ServiceResult> DeleteCategoryAsync(int id);
+    Task<ServiceResult> UpdateCategoryAsync(string id, CreateCategoryDTO dto);
+    Task<ServiceResult> DeleteCategoryAsync(string id);
 }

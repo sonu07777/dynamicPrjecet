@@ -41,8 +41,8 @@ public class RegisterDTO
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
-    public int? CompanyId { get; set; }
-    public int? BranchId { get; set; }
+    public string? CompanyId { get; set; }
+    public string? BranchId { get; set; }
     public string Role { get; set; } = string.Empty;
 }
 
@@ -53,8 +53,8 @@ public class AuthResponseDTO
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
-    public int? CompanyId { get; set; }
-    public int? BranchId { get; set; }
+    public string? CompanyId { get; set; }
+    public string? BranchId { get; set; }
     public DateTime Expiration { get; set; }
 }
 
@@ -65,8 +65,8 @@ public class UserDTO
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
-    public int? CompanyId { get; set; }
-    public int? BranchId { get; set; }
+    public string? CompanyId { get; set; }
+    public string? BranchId { get; set; }
     public string Role { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 }

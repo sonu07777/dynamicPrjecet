@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BikeShowroomAPI.DTOs;
-using BikeShowroomAPI.Models;
 using BikeShowroomAPI.Services;
 
 namespace BikeShowroomAPI.Controllers;
@@ -19,13 +18,13 @@ public class InventoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<InventoryDTO>>> GetInventory([FromQuery] int? branchId = null, [FromQuery] int? productId = null)
+    public async Task<ActionResult<IEnumerable<InventoryDTO>>> GetInventory([FromQuery] string? branchId = null, [FromQuery] string? productId = null)
     {
         return Ok(await _inventoryService.GetInventoryAsync(branchId, productId));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<InventoryDTO>> GetInventoryItem(int id)
+    public async Task<ActionResult<InventoryDTO>> GetInventoryItem(string id)
     {
         var inventory = await _inventoryService.GetInventoryItemAsync(id);
         return inventory == null ? NotFound() : Ok(inventory);
@@ -33,9 +32,9 @@ public class InventoryController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin,BranchManager")]
-    public async Task<ActionResult<InventoryDTO>> CreateInventory(Inventory inventory)
+    public async Task<ActionResult<InventoryDTO>> CreateInventory([FromBody] CreateInventoryDTO createDto)
     {
-        var result = await _inventoryService.CreateInventoryAsync(inventory);
+        var result = await _inventoryService.CreateInventoryAsync(createDto.ProductId, createDto.BranchId, createDto.Quantity);
         if (!result.Success)
             return BadRequest(new { message = result.Error });
 
@@ -44,12 +43,9 @@ public class InventoryController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin,BranchManager")]
-    public async Task<IActionResult> UpdateInventory(int id, Inventory inventory)
+    public async Task<IActionResult> UpdateInventory(string id, [FromBody] UpdateInventoryDTO updateDto)
     {
-        if (id != inventory.Id)
-            return BadRequest();
-
-        var result = await _inventoryService.UpdateInventoryAsync(id, inventory);
+        var result = await _inventoryService.UpdateInventoryAsync(id, updateDto.Quantity, updateDto.ReservedQuantity);
         return result.Success ? NoContent() : NotFound();
     }
 
@@ -62,7 +58,7 @@ public class InventoryController : ControllerBase
     }
 
     [HttpGet("low-stock")]
-    public async Task<ActionResult<IEnumerable<InventoryDTO>>> GetLowStock([FromQuery] int? branchId = null)
+    public async Task<ActionResult<IEnumerable<InventoryDTO>>> GetLowStock([FromQuery] string? branchId = null)
     {
         return Ok(await _inventoryService.GetLowStockAsync(branchId));
     }

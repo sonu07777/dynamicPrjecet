@@ -2,10 +2,10 @@ namespace BikeShowroomAPI.DTOs;
 
 public class PurchaseOrderDTO
 {
-    public int Id { get; set; }
-    public int CompanyId { get; set; }
-    public int BranchId { get; set; }
-    public int SupplierId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string CompanyId { get; set; } = string.Empty;
+    public string BranchId { get; set; } = string.Empty;
+    public string SupplierId { get; set; } = string.Empty;
     public string OrderNumber { get; set; } = string.Empty;
     public DateTime OrderDate { get; set; }
     public DateTime? ExpectedDeliveryDate { get; set; }
@@ -21,8 +21,8 @@ public class PurchaseOrderDTO
 
 public class PurchaseOrderItemDTO
 {
-    public int Id { get; set; }
-    public int ProductId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string ProductId { get; set; } = string.Empty;
     public string? ProductName { get; set; }
     public int QuantityOrdered { get; set; }
     public int QuantityReceived { get; set; }
@@ -32,9 +32,9 @@ public class PurchaseOrderItemDTO
 
 public class CreatePurchaseOrderDTO
 {
-    public int CompanyId { get; set; }
-    public int BranchId { get; set; }
-    public int SupplierId { get; set; }
+    public string CompanyId { get; set; } = string.Empty;
+    public string BranchId { get; set; } = string.Empty;
+    public string SupplierId { get; set; } = string.Empty;
     public DateTime? ExpectedDeliveryDate { get; set; }
     public string? Notes { get; set; }
     public List<CreatePurchaseOrderItemDTO> Items { get; set; } = new();
@@ -42,7 +42,7 @@ public class CreatePurchaseOrderDTO
 
 public class CreatePurchaseOrderItemDTO
 {
-    public int ProductId { get; set; }
+    public string ProductId { get; set; } = string.Empty;
     public int QuantityOrdered { get; set; }
     public decimal UnitPrice { get; set; }
 }

@@ -18,13 +18,13 @@ public class BranchesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<BranchDTO>>> GetBranches([FromQuery] int? companyId = null)
+    public async Task<ActionResult<IEnumerable<BranchDTO>>> GetBranches([FromQuery] string? companyId = null)
     {
         return Ok(await _branchService.GetBranchesAsync(companyId));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<BranchDTO>> GetBranch(int id)
+    public async Task<ActionResult<BranchDTO>> GetBranch(string id)
     {
         var branch = await _branchService.GetBranchAsync(id);
         return branch == null ? NotFound() : Ok(branch);
@@ -43,7 +43,7 @@ public class BranchesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin")]
-    public async Task<IActionResult> UpdateBranch(int id, CreateBranchDTO updateDto)
+    public async Task<IActionResult> UpdateBranch(string id, CreateBranchDTO updateDto)
     {
         var result = await _branchService.UpdateBranchAsync(id, updateDto);
         return result.Success ? NoContent() : NotFound();
@@ -51,7 +51,7 @@ public class BranchesController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin")]
-    public async Task<IActionResult> DeleteBranch(int id)
+    public async Task<IActionResult> DeleteBranch(string id)
     {
         var result = await _branchService.DeleteBranchAsync(id);
         return result.Success ? NoContent() : NotFound();

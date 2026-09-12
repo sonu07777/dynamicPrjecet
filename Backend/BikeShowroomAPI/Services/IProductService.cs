@@ -4,10 +4,10 @@ namespace BikeShowroomAPI.Services;
 
 public interface IProductService
 {
-    Task<List<ProductDTO>> GetProductsAsync(int? companyId = null, int? categoryId = null);
-    Task<ProductDTO?> GetProductAsync(int id);
+    Task<List<ProductDTO>> GetProductsAsync(string? companyId = null, string? categoryId = null);
+    Task<ProductDTO?> GetProductAsync(string id);
     Task<ServiceResult<ProductDTO>> CreateProductAsync(CreateProductDTO createDto);
-    Task<ServiceResult> UpdateProductAsync(int id, CreateProductDTO updateDto);
-    Task<ServiceResult> DeleteProductAsync(int id);
-    Task<List<ProductDTO>> SearchProductsAsync(string? query = null, int? companyId = null);
+    Task<ServiceResult> UpdateProductAsync(string id, CreateProductDTO updateDto);
+    Task<ServiceResult> DeleteProductAsync(string id);
+    Task<List<ProductDTO>> SearchProductsAsync(string? query = null, string? companyId = null);
 }

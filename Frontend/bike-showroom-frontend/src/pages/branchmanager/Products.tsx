@@ -15,9 +15,9 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface ProductRow {
-  id: number;
-  companyId: number;
-  categoryId: number;
+  id: string;
+  companyId: string;
+  categoryId: string;
   name: string;
   sku: string;
   barcode: string;
@@ -39,7 +39,7 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductRow | null>(null);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | undefined>(user?.companyId || undefined);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | undefined>(user?.companyId || undefined);
   const [form] = Form.useForm();
 
   const effectiveCompanyId = isSuperAdmin ? selectedCompanyId : user?.companyId;
@@ -131,7 +131,7 @@ const Products = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     modal.confirm({
       title: 'Delete this product?',
       content: 'This product will be deactivated.',
@@ -153,8 +153,8 @@ const Products = () => {
     { title: 'SKU', dataIndex: 'sku', key: 'sku', render: (v: string) => <strong>{v}</strong> },
     { title: 'Name', dataIndex: 'name', key: 'name' },
     { title: 'Category', dataIndex: 'categoryName', key: 'categoryName' },
-    { title: 'Cost Price', dataIndex: 'costPrice', key: 'costPrice', render: (v: number) => `₹₹{v.toFixed(2)}` },
-    { title: 'Sell Price', dataIndex: 'sellingPrice', key: 'sellingPrice', render: (v: number) => `₹₹{v.toFixed(2)}` },
+    { title: 'Cost Price', dataIndex: 'costPrice', key: 'costPrice', render: (v: number) => `₹${v.toFixed(2)}` },
+    { title: 'Sell Price', dataIndex: 'sellingPrice', key: 'sellingPrice', render: (v: number) => `₹${v.toFixed(2)}` },
     { title: 'Unit', dataIndex: 'unit', key: 'unit' },
     {
       title: 'Actions',

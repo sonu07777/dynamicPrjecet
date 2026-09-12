@@ -2,9 +2,9 @@ namespace BikeShowroomAPI.DTOs;
 
 public class ProductDTO
 {
-    public int Id { get; set; }
-    public int CompanyId { get; set; }
-    public int CategoryId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string CompanyId { get; set; } = string.Empty;
+    public string CategoryId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string SKU { get; set; } = string.Empty;
     public string Barcode { get; set; } = string.Empty;
@@ -21,8 +21,8 @@ public class ProductDTO
 
 public class CreateProductDTO
 {
-    public int CompanyId { get; set; }
-    public int CategoryId { get; set; }
+    public string CompanyId { get; set; } = string.Empty;
+    public string CategoryId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string SKU { get; set; } = string.Empty;
     public string Barcode { get; set; } = string.Empty;
@@ -37,27 +37,27 @@ public class CreateProductDTO
 
 public class CategoryDTO
 {
-    public int Id { get; set; }
-    public int CompanyId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string CompanyId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public int? ParentCategoryId { get; set; }
+    public string? ParentCategoryId { get; set; }
     public bool IsActive { get; set; }
 }
 
 public class CreateCategoryDTO
 {
-    public int CompanyId { get; set; }
+    public string CompanyId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public int? ParentCategoryId { get; set; }
+    public string? ParentCategoryId { get; set; }
 }
 
 public class InventoryDTO
 {
-    public int Id { get; set; }
-    public int ProductId { get; set; }
-    public int BranchId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string ProductId { get; set; } = string.Empty;
+    public string BranchId { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public int ReservedQuantity { get; set; }
     public int AvailableQuantity => Quantity - ReservedQuantity;
@@ -67,7 +67,20 @@ public class InventoryDTO
 
 public class InventoryAdjustmentDTO
 {
-    public int ProductId { get; set; }
-    public int BranchId { get; set; }
+    public string ProductId { get; set; } = string.Empty;
+    public string BranchId { get; set; } = string.Empty;
     public int Quantity { get; set; }
+}
+
+public class CreateInventoryDTO
+{
+    public string ProductId { get; set; } = string.Empty;
+    public string BranchId { get; set; } = string.Empty;
+    public int Quantity { get; set; }
+}
+
+public class UpdateInventoryDTO
+{
+    public int Quantity { get; set; }
+    public int ReservedQuantity { get; set; }
 }

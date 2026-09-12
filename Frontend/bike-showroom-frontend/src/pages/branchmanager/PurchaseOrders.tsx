@@ -11,7 +11,7 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface OrderRow {
-  id: number;
+  id: string;
   orderNumber: string;
   supplierName?: string;
   branchName?: string;
@@ -82,16 +82,16 @@ const PurchaseOrders = () => {
     }
   };
 
-  const handleUpdateStatus = async (id: number, status: string) => {
+  const handleUpdateStatus = async (id: string, status: string) => {
     try {
       await updateStatus({ id, status }).unwrap();
-      message.success(`Order marked as ₹{status}`);
+      message.success(`Order marked as ${status}`);
     } catch (error) {
       message.error(errMsg(error));
     }
   };
 
-  const handleCancel = (id: number) => {
+  const handleCancel = (id: string) => {
     modal.confirm({
       title: 'Cancel this order?',
       okText: 'Cancel Order',
@@ -107,7 +107,7 @@ const PurchaseOrders = () => {
     { title: 'Branch', dataIndex: 'branchName', key: 'branchName' },
     { title: 'Date', dataIndex: 'orderDate', key: 'orderDate', render: (v: string) => new Date(v).toLocaleDateString() },
     { title: 'Items', key: 'items', render: (_: unknown, r: OrderRow) => r.items?.length || 0 },
-    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => `₹₹{v.toFixed(2)}` },
+    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => `₹${v.toFixed(2)}` },
     {
       title: 'Status',
       dataIndex: 'status',
@@ -208,7 +208,7 @@ const PurchaseOrders = () => {
                       rules={[{ required: true, message: 'Select product' }]}
                       className="flex-1 !mb-0 w-full sm:w-auto"
                     >
-                      <Select placeholder="-- Select --" options={products.map((p) => ({ label: `₹{p.name} (₹{p.sku})`, value: p.id }))} />
+                      <Select placeholder="-- Select --" options={products.map((p) => ({ label: `${p.name} (${p.sku})`, value: p.id }))} />
                     </Form.Item>
                     <Form.Item
                       {...restField}

@@ -10,8 +10,8 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface CustomerRow {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -87,7 +87,7 @@ const Customers = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     modal.confirm({
       title: 'Delete this customer?',
       content: 'This customer will be deactivated.',

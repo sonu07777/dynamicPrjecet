@@ -1,14 +1,13 @@
 using BikeShowroomAPI.DTOs;
-using BikeShowroomAPI.Models;
 
 namespace BikeShowroomAPI.Services;
 
 public interface IInventoryService
 {
-    Task<List<InventoryDTO>> GetInventoryAsync(int? branchId = null, int? productId = null);
-    Task<InventoryDTO?> GetInventoryItemAsync(int id);
-    Task<ServiceResult<InventoryDTO>> CreateInventoryAsync(Inventory inventory);
-    Task<ServiceResult> UpdateInventoryAsync(int id, Inventory inventory);
+    Task<List<InventoryDTO>> GetInventoryAsync(string? branchId = null, string? productId = null);
+    Task<InventoryDTO?> GetInventoryItemAsync(string id);
+    Task<ServiceResult<InventoryDTO>> CreateInventoryAsync(string productId, string branchId, int quantity);
+    Task<ServiceResult> UpdateInventoryAsync(string id, int quantity, int reservedQuantity);
     Task<ServiceResult<int>> AdjustInventoryAsync(InventoryAdjustmentDTO adjustment);
-    Task<List<InventoryDTO>> GetLowStockAsync(int? branchId = null);
+    Task<List<InventoryDTO>> GetLowStockAsync(string? branchId = null);
 }

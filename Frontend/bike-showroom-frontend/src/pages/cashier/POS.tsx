@@ -33,12 +33,12 @@ const POS = () => {
     else setCart([...cart, { product, quantity: 1, discount: 0 }]);
   };
 
-  const updateQuantity = (pid: number, qty: number) => {
+  const updateQuantity = (pid: string, qty: number) => {
     if (qty <= 0) setCart(cart.filter((i) => i.product.id !== pid));
     else setCart(cart.map((i) => (i.product.id === pid ? { ...i, quantity: qty } : i)));
   };
 
-  const removeFromCart = (pid: number) => setCart(cart.filter((i) => i.product.id !== pid));
+  const removeFromCart = (pid: string) => setCart(cart.filter((i) => i.product.id !== pid));
   const subTotal = () => cart.reduce((s, i) => s + i.product.sellingPrice * i.quantity, 0);
   const discount = () => cart.reduce((s, i) => s + i.discount, 0);
   const tax = () => (subTotal() - discount()) * 0.1;
@@ -55,12 +55,12 @@ const POS = () => {
     try {
       const t = total();
       await createSale({
-        companyId:Number(user.companyId),
-        branchId: Number(user.branchId),
+        companyId: user.companyId,
+        branchId: user.branchId,
         customerId: null,
         subTotal: subTotal(), taxAmount: tax(), discountAmount: discount(), totalAmount: t,
         paymentMethod, paymentStatus: 'Paid', amountPaid: paymentMethod === 'Cash' ? amountReceived : t, amountDue: 0,
-        notes: customerName ? `Customer: ₹{customerName}` : null,
+        notes: customerName ? `Customer: ${customerName}` : null,
         items: cart.map((i) => ({ productId: i.product.id, quantity: i.quantity, unitPrice: i.product.sellingPrice, discount: i.discount, totalPrice: i.product.sellingPrice * i.quantity - i.discount }))
       }).unwrap();
       message.success(`Sale completed! Change: ₹₹{change().toFixed(2)}`);

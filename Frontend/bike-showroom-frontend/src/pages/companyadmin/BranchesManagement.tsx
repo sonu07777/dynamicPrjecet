@@ -8,8 +8,8 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface BranchRow {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   name: string;
   code: string;
   address: string;
@@ -84,7 +84,7 @@ const BranchesManagement = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     modal.confirm({
       title: 'Delete this branch?',
       content: 'This branch will be deactivated.',
@@ -102,7 +102,7 @@ const BranchesManagement = () => {
     });
   };
 
-  const getCompanyName = (cid: number) => {
+  const getCompanyName = (cid: string) => {
     const c = companies.find((c) => c.id === cid);
     return c ? c.name : `#${cid}`;
   };

@@ -10,8 +10,8 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface SupplierRow {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   name: string;
   contactPerson: string;
   email: string;
@@ -83,7 +83,7 @@ const Suppliers = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     modal.confirm({
       title: 'Delete this supplier?',
       content: 'This supplier will be deactivated.',

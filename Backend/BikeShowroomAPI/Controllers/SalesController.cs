@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BikeShowroomAPI.Data;
-using BikeShowroomAPI.Models;
-using System.Security.Claims;
+using BikeShowroomAPI.DTOs;
+using BikeShowroomAPI.Services;
 
 namespace BikeShowroomAPI.Controllers;
 
@@ -12,184 +10,62 @@ namespace BikeShowroomAPI.Controllers;
 [Authorize]
 public class SalesController : ControllerBase
 {
-    private readonly BikeShowroomContext _context;
+    private readonly ISalesService _salesService;
 
-    public SalesController(BikeShowroomContext context)
+    public SalesController(ISalesService salesService)
     {
-        _context = context;
+        _salesService = salesService;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Sale>>> GetSales([FromQuery] int? branchId = null, [FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
+    public async Task<ActionResult<IEnumerable<SaleDTO>>> GetSales(
+        [FromQuery] string? companyId = null,
+        [FromQuery] string? branchId = null,
+        [FromQuery] string? status = null,
+        [FromQuery] DateTime? fromDate = null,
+        [FromQuery] DateTime? toDate = null)
     {
-        var query = _context.Sales
-            .Include(s => s.Items)
-                .ThenInclude(i => i.Product)
-            .Include(s => s.Customer)
-            .Include(s => s.Payments)
-            .AsQueryable();
-
-        if (branchId.HasValue)
-            query = query.Where(s => s.BranchId == branchId.Value);
-
-        if (startDate.HasValue)
-            query = query.Where(s => s.SaleDate >= startDate.Value);
-
-        if (endDate.HasValue)
-            query = query.Where(s => s.SaleDate <= endDate.Value);
-
-        var sales = await query
-            .OrderByDescending(s => s.SaleDate)
-            .Take(100)
-            .ToListAsync();
-
-        return Ok(sales);
+        return Ok(await _salesService.GetSalesAsync(companyId, branchId, status, fromDate, toDate));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Sale>> GetSale(int id)
+    public async Task<ActionResult<SaleDTO>> GetSale(string id)
     {
-        var sale = await _context.Sales
-            .Include(s => s.Items)
-                .ThenInclude(i => i.Product)
-            .Include(s => s.Customer)
-            .Include(s => s.Payments)
-            .FirstOrDefaultAsync(s => s.Id == id);
-
-        if (sale == null)
-            return NotFound();
-
-        return Ok(sale);
+        var sale = await _salesService.GetSaleAsync(id);
+        return sale == null ? NotFound() : Ok(sale);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Sale>> CreateSale(CreateSaleDTO createSaleDto)
+    [Authorize(Roles = "SuperAdmin,CompanyAdmin,BranchManager,Cashier")]
+    public async Task<ActionResult<SaleDTO>> CreateSale(CreateSaleDTO createDto)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-            return Unauthorized();
+        var createdBy = User.Identity?.Name ?? "Unknown";
+        var result = await _salesService.CreateSaleAsync(createDto, createdBy);
 
-        // Generate invoice number
-        var invoiceNumber = $"INV-{DateTime.Now:yyyyMMdd}-{new Random().Next(1000, 9999)}";
+        if (!result.Success)
+            return result.Status == ServiceResultStatus.NotFound ? NotFound(new { message = result.Error }) : BadRequest(new { message = result.Error });
 
-        var sale = new Sale
-        {
-            CompanyId = createSaleDto.CompanyId,
-            BranchId = createSaleDto.BranchId,
-            CustomerId = createSaleDto.CustomerId,
-            InvoiceNumber = invoiceNumber,
-            SubTotal = createSaleDto.SubTotal,
-            TaxAmount = createSaleDto.TaxAmount,
-            DiscountAmount = createSaleDto.DiscountAmount,
-            TotalAmount = createSaleDto.TotalAmount,
-            PaymentMethod = createSaleDto.PaymentMethod,
-            PaymentStatus = createSaleDto.PaymentStatus,
-            AmountPaid = createSaleDto.AmountPaid,
-            AmountDue = createSaleDto.AmountDue,
-            Notes = createSaleDto.Notes,
-            CashierId = userId
-        };
-
-        // Add sale items
-        foreach (var itemDto in createSaleDto.Items)
-        {
-            var saleItem = new SaleItem
-            {
-                ProductId = itemDto.ProductId,
-                Quantity = itemDto.Quantity,
-                UnitPrice = itemDto.UnitPrice,
-                Discount = itemDto.Discount,
-                TotalPrice = itemDto.TotalPrice
-            };
-
-            sale.Items.Add(saleItem);
-
-            // Update inventory
-            var inventory = await _context.Inventories
-                .FirstOrDefaultAsync(i => i.ProductId == itemDto.ProductId && i.BranchId == createSaleDto.BranchId);
-
-            if (inventory != null)
-            {
-                inventory.Quantity -= itemDto.Quantity;
-                inventory.UpdatedAt = DateTime.UtcNow;
-            }
-        }
-
-        // Add payment if fully paid
-        if (createSaleDto.AmountPaid > 0)
-        {
-            var payment = new Payment
-            {
-                PaymentMethod = createSaleDto.PaymentMethod,
-                Amount = createSaleDto.AmountPaid,
-                ReferenceNumber = createSaleDto.PaymentReference
-            };
-            sale.Payments.Add(payment);
-        }
-
-        _context.Sales.Add(sale);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetSale), new { id = sale.Id }, sale);
+        return CreatedAtAction(nameof(GetSale), new { id = result.Data!.Id }, result.Data);
     }
 
-    [HttpGet("stats")]
-    public async Task<ActionResult<SalesStatsDTO>> GetSalesStats([FromQuery] int? branchId = null)
+    [HttpPut("{id}/status")]
+    [Authorize(Roles = "SuperAdmin,CompanyAdmin,BranchManager")]
+    public async Task<IActionResult> UpdateSaleStatus(string id, [FromBody] UpdateSaleStatusDTO statusDto)
     {
-        var query = _context.Sales.AsQueryable();
+        var result = await _salesService.UpdateSaleStatusAsync(id, statusDto.Status);
+        return result.Success ? NoContent() : NotFound(new { message = result.Error });
+    }
 
-        if (branchId.HasValue)
-            query = query.Where(s => s.BranchId == branchId.Value);
-
-        var today = DateTime.Today;
-        var todaySales = await query.Where(s => s.SaleDate >= today).ToListAsync();
-        var thisMonth = await query.Where(s => s.SaleDate.Month == DateTime.Now.Month && s.SaleDate.Year == DateTime.Now.Year).ToListAsync();
-
-        var stats = new SalesStatsDTO
-        {
-            TodaySales = todaySales.Count,
-            TodayRevenue = todaySales.Sum(s => s.TotalAmount),
-            MonthSales = thisMonth.Count,
-            MonthRevenue = thisMonth.Sum(s => s.TotalAmount),
-            AverageSale = todaySales.Any() ? todaySales.Average(s => s.TotalAmount) : 0
-        };
-
-        return Ok(stats);
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "SuperAdmin,CompanyAdmin")]
+    public async Task<IActionResult> DeleteSale(string id)
+    {
+        var result = await _salesService.DeleteSaleAsync(id);
+        return result.Success ? NoContent() : NotFound(new { message = result.Error });
     }
 }
 
-public class CreateSaleDTO
+public class UpdateSaleStatusDTO
 {
-    public int CompanyId { get; set; }
-    public int BranchId { get; set; }
-    public int? CustomerId { get; set; }
-    public decimal SubTotal { get; set; }
-    public decimal TaxAmount { get; set; }
-    public decimal DiscountAmount { get; set; }
-    public decimal TotalAmount { get; set; }
-    public string PaymentMethod { get; set; } = string.Empty;
-    public string PaymentStatus { get; set; } = string.Empty;
-    public decimal AmountPaid { get; set; }
-    public decimal AmountDue { get; set; }
-    public string? Notes { get; set; }
-    public string? PaymentReference { get; set; }
-    public List<CreateSaleItemDTO> Items { get; set; } = new();
-}
-
-public class CreateSaleItemDTO
-{
-    public int ProductId { get; set; }
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-    public decimal Discount { get; set; }
-    public decimal TotalPrice { get; set; }
-}
-
-public class SalesStatsDTO
-{
-    public int TodaySales { get; set; }
-    public decimal TodayRevenue { get; set; }
-    public int MonthSales { get; set; }
-    public decimal MonthRevenue { get; set; }
-    public decimal AverageSale { get; set; }
+    public string Status { get; set; } = string.Empty;
 }

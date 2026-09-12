@@ -12,7 +12,7 @@ const { Title } = Typography;
 
 const Reports = () => {
   const { user } = useAppSelector((state) => state.auth);
-  const [selectedBranch, setSelectedBranch] = useState<number | undefined>();
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>();
 
   const { data: stats } = useGetSalesStatsQuery({ branchId: selectedBranch }, { skip: !user?.companyId });
   const { data: recentSales = [] } = useGetSalesQuery({ branchId: selectedBranch }, { skip: !user?.companyId });

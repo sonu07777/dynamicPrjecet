@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using MongoDB.Driver;
 
-using BikeShowroomAPI.Data;
+using BikeShowroomAPI.Data.MongoDB;
 using BikeShowroomAPI.Filters;
-using BikeShowroomAPI.Models;
+using BikeShowroomAPI.Models.MongoDB;
 using BikeShowroomAPI.Services;
+using BikeShowroomAPI.Services.MongoDB;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,38 +23,12 @@ builder.Services.AddControllers(options =>
 })
 .AddJsonOptions(options =>
 {
-    // Prevent "possible object cycle detected" errors when serializing EF Core
+    // Prevent "possible object cycle detected" errors when serializing MongoDB
     // entities with circular navigation properties (e.g. Sale <-> SaleItem).
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen(c =>
-// {
-//     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-//     {
-//         Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
-//         Name = "Authorization",
-//         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-//         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-//         Scheme = "Bearer"
-//     });
-
-//     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-//     {
-//         {
-//             new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-//             {
-//                 Reference = new Microsoft.OpenApi.Models.OpenApiReference
-//                 {
-//                     Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-//                     Id = "Bearer"
-//                 }
-//             },
-//             Array.Empty<string>()
-//         }
-//     });
-// });
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -85,35 +60,22 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-var connectionString =
-    builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Server=localhost;Port=3306;Database=MultiBranchInventoryDB;User=root;Password=sonu@123;";
 
-builder.Services.AddDbContext<BikeShowroomContext>(options =>
-    options.UseMySql(
-        connectionString,
-        new MySqlServerVersion(new Version(8, 0, 0))
-    ));
-// Database
-// builder.Services.AddDbContext<BikeShowroomContext>(options =>
-//     // options.UseSqlServer(
-//     //     builder.Configuration.GetConnectionString("DefaultConnection")
-//     //     ?? "Server=(localdb)\\mssqllocaldb;Database=MultiBranchInventoryDB;Trusted_Connection=true;TrustServerCertificate=true"
-//     // )
-// );
-
-// Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+// MongoDB Configuration
+builder.Services.Configure<MongoDbSettings>(options =>
 {
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
-    options.User.RequireUniqueEmail = true;
-})
-.AddEntityFrameworkStores<BikeShowroomContext>()
-.AddDefaultTokenProviders();
+    options.ConnectionString = builder.Configuration.GetConnectionString("MongoDB")
+        ?? "mongodb://localhost:27017";
+    options.DatabaseName = builder.Configuration["MongoDB:DatabaseName"] ?? "BikeShowroomDB";
+});
+
+// Register MongoDB
+builder.Services.AddSingleton<IMongoClient>(sp =>
+    new MongoClient(sp.GetRequiredService<IOptions<MongoDbSettings>>().Value.ConnectionString));
+builder.Services.AddScoped(sp =>
+    sp.GetRequiredService<IMongoClient>().GetDatabase(
+        sp.GetRequiredService<IOptions<MongoDbSettings>>().Value.DatabaseName));
+builder.Services.AddScoped<MongoDbContext>();
 
 // JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSecureSecretKeyHere_ChangeThisInProduction_MinimumLength32Characters!";
@@ -150,7 +112,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register services
+// Register MongoDB services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
@@ -158,6 +120,10 @@ builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+builder.Services.AddScoped<ISalesService, SalesService>();
+builder.Services.AddScoped<IStockTransferService, StockTransferService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // AuditLogService microservice client
@@ -170,20 +136,18 @@ builder.Services.AddHttpClient<IAuditService, AuditService>(client =>
 
 var app = builder.Build();
 
-// Seed roles and default admin user
+// Seed initial data (roles, admin user)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        await SeedRolesAndAdminUser(roleManager, userManager);
+        await SeedData(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding roles and admin user");
+        logger.LogError(ex, "An error occurred while seeding data");
     }
 }
 
@@ -201,39 +165,44 @@ app.MapControllers();
 
 app.Run();
 
-// Seed roles and admin user
-static async Task SeedRolesAndAdminUser(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+// Seed data for MongoDB
+static async Task SeedData(IServiceProvider services)
 {
-    // Seed roles
-    string[] roleNames = { "SuperAdmin", "CompanyAdmin", "BranchManager", "Cashier" };
-    foreach (var roleName in roleNames)
+    var context = services.GetRequiredService<MongoDbContext>();
+
+    // Ensure indexes are created
+    await context.EnsureIndexesAsync();
+
+    // Check whether the default admin user already exists.
+    // Do not skip seeding just because other users exist in the database.
+    var adminExists = await context.Users.CountDocumentsAsync(u =>
+        u.Email == "admin@bikeshowroom.com") > 0;
+    if (adminExists)
+        return;
+
+    // Create default SuperAdmin user
+    var superAdmin = new ApplicationUser
     {
-        if (!await roleManager.RoleExistsAsync(roleName))
-        {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
-        }
-    }
+        UserName = "admin@bikeshowroom.com",
+        NormalizedUserName = "ADMIN@BIKESHOWROOM.COM",
+        Email = "admin@bikeshowroom.com",
+        NormalizedEmail = "ADMIN@BIKESHOWROOM.COM",
+        EmailConfirmed = true,
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+        SecurityStamp = Guid.NewGuid().ToString(),
+        PhoneNumber = "",
+        PhoneNumberConfirmed = false,
+        TwoFactorEnabled = false,
+        LockoutEnabled = true,
+        AccessFailedCount = 0,
+        FirstName = "Super",
+        LastName = "Admin",
+        CompanyId = null,
+        BranchId = null,
+        IsActive = true,
+        CreatedAt = DateTime.UtcNow,
+        Roles = new List<string> { "SuperAdmin" }
+    };
 
-    // Seed super admin user
-    var adminEmail = "admin@bikeshowroom.com";
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-    if (adminUser == null)
-    {
-        var superAdmin = new ApplicationUser
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            FirstName = "Super",
-            LastName = "Admin",
-            EmailConfirmed = true,
-            IsActive = true
-        };
-
-        var result = await userManager.CreateAsync(superAdmin, "Admin@123");
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
-        }
-    }
+    await context.Users.InsertOneAsync(superAdmin);
 }

@@ -18,13 +18,13 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts([FromQuery] int? companyId = null, [FromQuery] int? categoryId = null)
+    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts([FromQuery] string? companyId = null, [FromQuery] string? categoryId = null)
     {
         return Ok(await _productService.GetProductsAsync(companyId, categoryId));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProductDTO>> GetProduct(int id)
+    public async Task<ActionResult<ProductDTO>> GetProduct(string id)
     {
         var product = await _productService.GetProductAsync(id);
         return product == null ? NotFound() : Ok(product);
@@ -43,7 +43,7 @@ public class ProductsController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin,BranchManager")]
-    public async Task<IActionResult> UpdateProduct(int id, CreateProductDTO updateDto)
+    public async Task<IActionResult> UpdateProduct(string id, CreateProductDTO updateDto)
     {
         var result = await _productService.UpdateProductAsync(id, updateDto);
         if (!result.Success)
@@ -54,7 +54,7 @@ public class ProductsController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "SuperAdmin,CompanyAdmin")]
-    public async Task<IActionResult> DeleteProduct(int id)
+    public async Task<IActionResult> DeleteProduct(string id)
     {
         var result = await _productService.DeleteProductAsync(id);
         return result.Success ? NoContent() : NotFound();
@@ -63,7 +63,7 @@ public class ProductsController : ControllerBase
     [HttpGet("search")]
     public async Task<ActionResult<IEnumerable<ProductDTO>>> SearchProducts(
         [FromQuery] string? query = null,
-        [FromQuery] int? companyId = null)
+        [FromQuery] string? companyId = null)
     {
         return Ok(await _productService.SearchProductsAsync(query, companyId));
     }

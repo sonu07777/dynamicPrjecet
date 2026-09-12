@@ -7,7 +7,7 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface CompanyRow {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -60,7 +60,7 @@ const CompaniesManagement = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     modal.confirm({
       title: 'Delete this company?',
       content: 'This company will be deactivated.',

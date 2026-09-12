@@ -4,8 +4,8 @@ export interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  companyId?: number;
-  branchId?: number;
+  companyId?: string;
+  branchId?: string;
   role: string;
   isActive: boolean;
 }
@@ -21,8 +21,8 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  companyId?: number;
-  branchId?: number;
+  companyId?: string;
+  branchId?: string;
   role: string;
 }
 
@@ -32,8 +32,8 @@ export interface AuthResponse {
   firstName: string;
   lastName: string;
   role: string;
-  companyId?: number;
-  branchId?: number;
+  companyId?: string;
+  branchId?: string;
   expiration: string;
 }
 
@@ -53,7 +53,7 @@ export interface ChangePasswordRequest {
 }
 
 export interface Company {
-  id: number;
+  id: string;
   name: string;
   address: string;
   city: string;
@@ -80,8 +80,8 @@ export interface CreateCompany {
 }
 
 export interface Branch {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   name: string;
   code: string;
   address: string;
@@ -94,7 +94,7 @@ export interface Branch {
 }
 
 export interface CreateBranch {
-  companyId: number;
+  companyId: string;
   name: string;
   code: string;
   address: string;
@@ -106,9 +106,9 @@ export interface CreateBranch {
 }
 
 export interface Product {
-  id: number;
-  companyId: number;
-  categoryId: number;
+  id: string;
+  companyId: string;
+  categoryId: string;
   name: string;
   sku: string;
   barcode: string;
@@ -124,8 +124,8 @@ export interface Product {
 }
 
 export interface CreateProduct {
-  companyId: number;
-  categoryId: number;
+  companyId: string;
+  categoryId: string;
   name: string;
   sku: string;
   barcode: string;
@@ -139,25 +139,25 @@ export interface CreateProduct {
 }
 
 export interface Category {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   name: string;
   description: string;
-  parentCategoryId?: number;
+  parentCategoryId?: string;
   isActive: boolean;
 }
 
 export interface CreateCategory {
-  companyId: number;
+  companyId: string;
   name: string;
   description: string;
-  parentCategoryId?: number;
+  parentCategoryId?: string;
 }
 
 export interface Inventory {
-  id: number;
-  productId: number;
-  branchId: number;
+  id: string;
+  productId: string;
+  branchId: string;
   quantity: number;
   reservedQuantity: number;
   availableQuantity: number;
@@ -166,8 +166,8 @@ export interface Inventory {
 }
 
 export interface Customer {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -184,7 +184,7 @@ export interface Customer {
 }
 
 export interface CreateCustomer {
-  companyId: number;
+  companyId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -198,8 +198,8 @@ export interface CreateCustomer {
 }
 
 export interface Supplier {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   name: string;
   contactPerson: string;
   email: string;
@@ -214,7 +214,7 @@ export interface Supplier {
 }
 
 export interface CreateSupplier {
-  companyId: number;
+  companyId: string;
   name: string;
   contactPerson: string;
   email: string;
@@ -227,10 +227,10 @@ export interface CreateSupplier {
 }
 
 export interface PurchaseOrder {
-  id: number;
-  companyId: number;
-  branchId: number;
-  supplierId: number;
+  id: string;
+  companyId: string;
+  branchId: string;
+  supplierId: string;
   orderNumber: string;
   orderDate: string;
   expectedDeliveryDate?: string;
@@ -245,8 +245,8 @@ export interface PurchaseOrder {
 }
 
 export interface PurchaseOrderItem {
-  id: number;
-  productId: number;
+  id: string;
+  productId: string;
   productName?: string;
   quantityOrdered: number;
   quantityReceived: number;
@@ -255,25 +255,25 @@ export interface PurchaseOrderItem {
 }
 
 export interface CreatePurchaseOrder {
-  companyId: number;
-  branchId: number;
-  supplierId: number;
+  companyId: string;
+  branchId: string;
+  supplierId: string;
   expectedDeliveryDate?: string;
   notes?: string;
   items: CreatePurchaseOrderItem[];
 }
 
 export interface CreatePurchaseOrderItem {
-  productId: number;
+  productId: string;
   quantityOrdered: number;
   unitPrice: number;
 }
 
 export interface StockTransfer {
-  id: number;
-  companyId: number;
-  fromBranchId: number;
-  toBranchId: number;
+  id: string;
+  companyId: string;
+  fromBranchId: string;
+  toBranchId: string;
   transferNumber: string;
   transferDate: string;
   status: string;
@@ -285,22 +285,22 @@ export interface StockTransfer {
 }
 
 export interface StockTransferItem {
-  id: number;
-  productId: number;
+  id: string;
+  productId: string;
   productName?: string;
   quantity: number;
 }
 
 export interface CreateStockTransfer {
-  companyId: number;
-  fromBranchId: number;
-  toBranchId: number;
+  companyId: string;
+  fromBranchId: string;
+  toBranchId: string;
   notes?: string;
   items: CreateStockTransferItem[];
 }
 
 export interface CreateStockTransferItem {
-  productId: number;
+  productId: string;
   quantity: number;
 }
 
@@ -313,7 +313,7 @@ export interface SalesStats {
 }
 
 export interface AuditLog {
-  id: number;
+  id: string;
   timestamp: string;
   userId?: string;
   userEmail?: string;
@@ -322,6 +322,6 @@ export interface AuditLog {
   action: string;
   details?: string;
   ipAddress?: string;
-  companyId?: number;
-  branchId?: number;
+  companyId?: string;
+  branchId?: string;
 }

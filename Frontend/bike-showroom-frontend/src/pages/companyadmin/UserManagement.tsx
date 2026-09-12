@@ -14,8 +14,8 @@ interface UserRow {
   lastName: string;
   email: string;
   phoneNumber?: string;
-  companyId?: number;
-  branchId?: number;
+  companyId?: string;
+  branchId?: string;
   role: string;
   isActive: boolean;
 }
@@ -125,12 +125,12 @@ const UserManagement = () => {
     }
   };
 
-  const getCompanyName = (cid?: number) => {
+  const getCompanyName = (cid?: string) => {
     if (!cid) return '-';
     const c = companies.find((c) => c.id === cid);
     return c ? c.name : '-';
   };
-  const getBranchName = (bid?: number) => {
+  const getBranchName = (bid?: string) => {
     if (!bid) return '-';
     const b = branches.find((b) => b.id === bid);
     return b ? b.name : '-';

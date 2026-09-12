@@ -2,10 +2,10 @@ namespace BikeShowroomAPI.DTOs;
 
 public class StockTransferDTO
 {
-    public int Id { get; set; }
-    public int CompanyId { get; set; }
-    public int FromBranchId { get; set; }
-    public int ToBranchId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string CompanyId { get; set; } = string.Empty;
+    public string FromBranchId { get; set; } = string.Empty;
+    public string ToBranchId { get; set; } = string.Empty;
     public string TransferNumber { get; set; } = string.Empty;
     public DateTime TransferDate { get; set; }
     public string Status { get; set; } = string.Empty;
@@ -18,23 +18,23 @@ public class StockTransferDTO
 
 public class StockTransferItemDTO
 {
-    public int Id { get; set; }
-    public int ProductId { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string ProductId { get; set; } = string.Empty;
     public string? ProductName { get; set; }
     public int Quantity { get; set; }
 }
 
 public class CreateStockTransferDTO
 {
-    public int CompanyId { get; set; }
-    public int FromBranchId { get; set; }
-    public int ToBranchId { get; set; }
+    public string CompanyId { get; set; } = string.Empty;
+    public string FromBranchId { get; set; } = string.Empty;
+    public string ToBranchId { get; set; } = string.Empty;
     public string? Notes { get; set; }
     public List<CreateStockTransferItemDTO> Items { get; set; } = new();
 }
 
 public class CreateStockTransferItemDTO
 {
-    public int ProductId { get; set; }
+    public string ProductId { get; set; } = string.Empty;
     public int Quantity { get; set; }
 }

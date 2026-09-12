@@ -25,7 +25,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<CompanyDTO>> GetCompany(int id)
+    public async Task<ActionResult<CompanyDTO>> GetCompany(string id)
     {
         var company = await _companyService.GetCompanyAsync(id);
         return company == null ? NotFound() : Ok(company);
@@ -44,7 +44,7 @@ public class CompaniesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "SuperAdmin")]
-    public async Task<IActionResult> UpdateCompany(int id, CreateCompanyDTO updateDto)
+    public async Task<IActionResult> UpdateCompany(string id, CreateCompanyDTO updateDto)
     {
         var result = await _companyService.UpdateCompanyAsync(id, updateDto);
         return result.Success ? NoContent() : NotFound();
@@ -52,7 +52,7 @@ public class CompaniesController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "SuperAdmin")]
-    public async Task<IActionResult> DeleteCompany(int id)
+    public async Task<IActionResult> DeleteCompany(string id)
     {
         var result = await _companyService.DeleteCompanyAsync(id);
         return result.Success ? NoContent() : NotFound();

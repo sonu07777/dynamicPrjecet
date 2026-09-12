@@ -18,7 +18,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers([FromQuery] int? companyId = null)
+    public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers([FromQuery] string? companyId = null)
     {
         return Ok(await _userService.GetUsersAsync(User, companyId));
     }

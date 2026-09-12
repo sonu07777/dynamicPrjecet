@@ -14,11 +14,11 @@ import { errMsg } from '../../utils/error';
 const { Title } = Typography;
 
 interface CategoryRow {
-  id: number;
-  companyId: number;
+  id: string;
+  companyId: string;
   name: string;
   description: string;
-  parentCategoryId?: number;
+  parentCategoryId?: string;
   isActive: boolean;
 }
 
@@ -29,7 +29,7 @@ const Categories = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryRow | null>(null);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | undefined>(user?.companyId || undefined);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | undefined>(user?.companyId || undefined);
   const [form] = Form.useForm();
 
   const effectiveCompanyId = isSuperAdmin ? selectedCompanyId : user?.companyId;
@@ -65,7 +65,7 @@ const Categories = () => {
     setShowForm(true);
   };
 
-  const handleSubmit = async (values: { name: string; description?: string; parentCategoryId?: number }) => {
+  const handleSubmit = async (values: { name: string; description?: string; parentCategoryId?: string }) => {
     const companyId = effectiveCompanyId;
     if (!companyId) {
       message.warning('Please select a company first');
@@ -89,7 +89,7 @@ const Categories = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     modal.confirm({
       title: 'Delete this category?',
       content: 'This category will be deactivated.',
@@ -107,7 +107,7 @@ const Categories = () => {
     });
   };
 
-  const getParentName = (parentId?: number) => {
+  const getParentName = (parentId?: string) => {
     if (!parentId) return '-';
     const p = categories.find((c) => c.id === parentId);
     return p ? p.name : '-';

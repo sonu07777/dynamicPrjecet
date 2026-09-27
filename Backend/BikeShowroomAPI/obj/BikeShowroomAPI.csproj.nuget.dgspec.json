@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\BikeShowroomAPI\\BikeShowroomAPI.csproj": {}
+    "/Users/sonusahoo/dynamicPrjecet/Backend/BikeShowroomAPI/BikeShowroomAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\BikeShowroomAPI\\BikeShowroomAPI.csproj": {
+    "/Users/sonusahoo/dynamicPrjecet/Backend/BikeShowroomAPI/BikeShowroomAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\BikeShowroomAPI\\BikeShowroomAPI.csproj",
+        "projectUniqueName": "/Users/sonusahoo/dynamicPrjecet/Backend/BikeShowroomAPI/BikeShowroomAPI.csproj",
         "projectName": "BikeShowroomAPI",
-        "projectPath": "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\BikeShowroomAPI\\BikeShowroomAPI.csproj",
-        "packagesPath": "C:\\Users\\sonus\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\BikeShowroomAPI\\obj\\",
+        "projectPath": "/Users/sonusahoo/dynamicPrjecet/Backend/BikeShowroomAPI/BikeShowroomAPI.csproj",
+        "packagesPath": "/Users/sonusahoo/.nuget/packages/",
+        "outputPath": "/Users/sonusahoo/dynamicPrjecet/Backend/BikeShowroomAPI/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\sonus\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/sonusahoo/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -92,7 +86,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

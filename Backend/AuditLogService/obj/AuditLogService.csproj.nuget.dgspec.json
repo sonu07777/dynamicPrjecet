@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\AuditLogService\\AuditLogService.csproj": {}
+    "/Users/sonusahoo/dynamicPrjecet/Backend/AuditLogService/AuditLogService.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\AuditLogService\\AuditLogService.csproj": {
+    "/Users/sonusahoo/dynamicPrjecet/Backend/AuditLogService/AuditLogService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\AuditLogService\\AuditLogService.csproj",
+        "projectUniqueName": "/Users/sonusahoo/dynamicPrjecet/Backend/AuditLogService/AuditLogService.csproj",
         "projectName": "AuditLogService",
-        "projectPath": "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\AuditLogService\\AuditLogService.csproj",
-        "packagesPath": "C:\\Users\\sonus\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sonus\\Downloads\\BikeShowroom\\BikeShowroom\\Backend\\AuditLogService\\obj\\",
+        "projectPath": "/Users/sonusahoo/dynamicPrjecet/Backend/AuditLogService/AuditLogService.csproj",
+        "packagesPath": "/Users/sonusahoo/.nuget/packages/",
+        "outputPath": "/Users/sonusahoo/dynamicPrjecet/Backend/AuditLogService/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\sonus\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/sonusahoo/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -91,19 +85,15 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.17, 9.0.17]"
+              "version": "[9.0.18, 9.0.18]"
             },
             {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[9.0.17, 9.0.17]"
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[9.0.18, 9.0.18]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[9.0.17, 9.0.17]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[9.0.17, 9.0.17]"
+              "version": "[9.0.18, 9.0.18]"
             }
           ],
           "frameworkReferences": {
@@ -114,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

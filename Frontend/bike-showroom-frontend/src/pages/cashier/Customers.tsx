@@ -25,6 +25,19 @@ interface CustomerRow {
   currentBalance: number;
 }
 
+interface CustomerFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  customerType?: string;
+  creditLimit?: number | null;
+}
+
 const Customers = () => {
   const { user } = useAppSelector((state) => state.auth);
   const { message, modal } = AntdApp.useApp();
@@ -32,15 +45,15 @@ const Customers = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<CustomerRow | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<CustomerFormValues>();
 
   const { data: customers = [], isLoading } = useGetCustomersQuery(
     { companyId: user?.companyId, searchQuery: searchQuery || undefined },
     { skip: !user?.companyId }
   );
-  const [createCustomer] = useCreateCustomerMutation();
-  const [updateCustomer] = useUpdateCustomerMutation();
-  const [deleteCustomer] = useDeleteCustomerMutation();
+  const [createCustomer, { isLoading: creating }] = useCreateCustomerMutation();
+  const [updateCustomer, { isLoading: updating }] = useUpdateCustomerMutation();
+  const [deleteCustomer, { isLoading: deleting }] = useDeleteCustomerMutation();
 
   const openAdd = () => {
     setEditingCustomer(null);
@@ -59,19 +72,19 @@ const Customers = () => {
     setShowForm(true);
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: CustomerFormValues) => {
     const companyId = user?.companyId;
     if (!companyId) return;
     const payload = {
       companyId,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      phone: values.phone,
-      address: values.address || '',
-      city: values.city || '',
-      state: values.state || '',
-      zipCode: values.zipCode || '',
+      firstName: values.firstName.trim(),
+      lastName: values.lastName.trim(),
+      email: values.email.trim(),
+      phone: values.phone.trim(),
+      address: values.address?.trim() || '',
+      city: values.city?.trim() || '',
+      state: values.state?.trim() || '',
+      zipCode: values.zipCode?.trim() || '',
       customerType: values.customerType || 'Regular',
       creditLimit: values.creditLimit ?? 0,
     };
@@ -115,8 +128,8 @@ const Customers = () => {
       key: 'customerType',
       render: (v: string) => <Tag color="green">{v}</Tag>,
     },
-    { title: 'Credit Limit', dataIndex: 'creditLimit', key: 'creditLimit', render: (v: number) => `₹₹{v.toFixed(2)}` },
-    { title: 'Balance', dataIndex: 'currentBalance', key: 'currentBalance', render: (v: number) => `₹₹{v.toFixed(2)}` },
+    { title: 'Credit Limit', dataIndex: 'creditLimit', key: 'creditLimit', render: (v: number) => `₹${v.toFixed(2)}` },
+    { title: 'Balance', dataIndex: 'currentBalance', key: 'currentBalance', render: (v: number) => `₹${v.toFixed(2)}` },
     {
       title: 'Actions',
       key: 'actions',
@@ -125,7 +138,7 @@ const Customers = () => {
           <Button icon={<EditOutlined />} onClick={() => handleEdit(r)}>
             Edit
           </Button>
-          <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(r.id)}>
+          <Button danger icon={<DeleteOutlined />} loading={deleting} onClick={() => handleDelete(r.id)}>
             Delete
           </Button>
         </Space>
@@ -156,6 +169,7 @@ const Customers = () => {
         title={editingCustomer ? 'Edit Customer' : 'Add New Customer'}
         open={showForm}
         onOk={() => form.submit()}
+        confirmLoading={creating || updating}
         onCancel={() => {
           setShowForm(false);
           setEditingCustomer(null);

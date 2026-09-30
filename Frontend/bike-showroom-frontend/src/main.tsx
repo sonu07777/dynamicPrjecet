@@ -14,8 +14,8 @@ createRoot(document.getElementById('root')!).render(
       locale={enUS}
       theme={{
         token: {
-          colorPrimary: '#667eea',
-          colorInfo: '#667eea',
+          colorPrimary: '#b45309',
+          colorInfo: '#0f766e',
           colorSuccess: '#2e7d32',
           colorWarning: '#e65100',
           colorError: '#dc3545',

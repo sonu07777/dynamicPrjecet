@@ -7,7 +7,7 @@ export const auditApi = apiSlice.injectEndpoints({
       query: (params) => ({ url: '/auditlogs', params }),
       providesTags: [{ type: 'AuditLog', id: 'LIST' }],
     }),
-    getAuditLog: builder.query<AuditLog, number>({
+    getAuditLog: builder.query<AuditLog, string>({
       query: (id) => ({ url: `/auditlogs/${id}` }),
       providesTags: (_result, _error, id) => [{ type: 'AuditLog', id }],
     }),

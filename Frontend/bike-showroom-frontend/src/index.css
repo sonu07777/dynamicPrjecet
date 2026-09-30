@@ -1,8 +1,8 @@
-@import "tailwindcss";
+@import "./utility-compat.css";
 
-@theme {
-  --color-primary: #667eea;
-  --color-secondary: #764ba2;
+:root {
+  --color-primary: #b45309;
+  --color-secondary: #0f766e;
   --color-danger: #dc3545;
   --color-danger-dark: #c82333;
   --color-success: #2e7d32;

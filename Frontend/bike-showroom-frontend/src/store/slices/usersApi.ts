@@ -3,7 +3,7 @@ import type { User, RegisterRequest } from '../../types';
 
 export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<User[], { companyId?: number }>({
+    getUsers: builder.query<User[], { companyId?: string }>({
       query: (params) => ({ url: '/users', params }),
       providesTags: (result) =>
         result

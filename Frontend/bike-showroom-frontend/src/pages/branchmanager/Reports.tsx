@@ -7,6 +7,7 @@ import { useGetProductsQuery } from '../../store/slices/productsApi';
 import { useGetCustomersQuery } from '../../store/slices/customersApi';
 import { useGetBranchesQuery } from '../../store/slices/companiesBranchesApi';
 import Chart from '../../components/Chart';
+import { formatINR, formatIndianNumber } from '../../utils/currency';
 
 const { Title } = Typography;
 
@@ -61,7 +62,7 @@ const Reports = () => {
       type: 'value' as const,
       axisLabel: {
         color: '#666',
-        formatter: (v: number) => `₹₹{v.toFixed(0)}`,
+        formatter: (v: number) => formatINR(v),
       },
       splitLine: { lineStyle: { color: '#f0f0f0' } },
     },
@@ -75,7 +76,7 @@ const Reports = () => {
       label: {
         show: true,
         position: 'top' as const,
-        formatter: (p: any) => `₹₹{(p.value as number).toFixed(0)}`,
+        formatter: (p: any) => formatINR(p.value as number),
         color: '#333',
         fontWeight: 'bold' as const,
       },
@@ -86,7 +87,7 @@ const Reports = () => {
   const paymentOption = useMemo(() => ({
     tooltip: {
       trigger: 'item' as const,
-      formatter: (p: any) => `₹{p.name}: ₹₹{p.value.toFixed(2)}`,
+      formatter: (p: any) => `${p.name}: ${formatINR(p.value)}`,
     },
     series: [{
       type: 'pie' as const,
@@ -96,7 +97,7 @@ const Reports = () => {
       itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 },
       label: {
         show: true,
-        formatter: '{b}: ₹{c}',
+        formatter: (point: any) => `${point.name}: ${formatINR(point.value)}`,
         color: '#666',
         fontSize: 12,
       },
@@ -110,7 +111,7 @@ const Reports = () => {
       trigger: 'axis' as const,
       formatter: (p: any) => {
         const item = p[0];
-        return `₹{item.axisValue}<br/>Revenue: ₹₹{(item.value as number).toFixed(2)}`;
+        return `${item.axisValue}<br/>Revenue: ${formatINR(item.value as number)}`;
       },
     },
     grid: { left: 50, right: 20, top: 30, bottom: 40 },
@@ -124,7 +125,7 @@ const Reports = () => {
       type: 'value' as const,
       axisLabel: {
         color: '#666',
-        formatter: (v: number) => `₹₹{v.toFixed(0)}`,
+        formatter: (v: number) => formatINR(v),
       },
       splitLine: { lineStyle: { color: '#f0f0f0' } },
     },
@@ -146,7 +147,7 @@ const Reports = () => {
       itemStyle: { color: '#667eea' },
       label: {
         show: salesTrendData.dates.length <= 7,
-        formatter: (p: any) => `₹₹{(p.value as number).toFixed(0)}`,
+        formatter: (p: any) => formatINR(p.value as number),
         color: '#667eea',
         fontSize: 11,
       },
@@ -170,19 +171,19 @@ const Reports = () => {
   }), [products.length, lowStock.length]);
 
   const statCards = [
-    { icon: '💰', label: "Today's Revenue", value: stats?.todayRevenue ?? 0, sub: `₹{stats?.todaySales || 0} sales today`, prefix: '₹', precision: 2 },
-    { icon: '📈', label: 'Monthly Revenue', value: stats?.monthRevenue ?? 0, sub: `₹{stats?.monthSales || 0} sales this month`, prefix: '₹', precision: 2 },
-    { icon: '📦', label: 'Products', value: products.length, sub: 'Total products', precision: 0 },
-    { icon: '⚠️', label: 'Low Stock Items', value: lowStock.length, sub: 'Need reorder', precision: 0 },
-    { icon: '👥', label: 'Customers', value: customers.length, sub: 'Registered', precision: 0 },
-    { icon: '📊', label: 'Average Sale', value: stats?.averageSale ?? 0, sub: 'Per transaction', prefix: '₹', precision: 2 },
+    { icon: '💰', label: "Today's Revenue", value: stats?.todayRevenue ?? 0, sub: `${formatIndianNumber(stats?.todaySales || 0)} sales today`, currency: true },
+    { icon: '📈', label: 'Monthly Revenue', value: stats?.monthRevenue ?? 0, sub: `${formatIndianNumber(stats?.monthSales || 0)} sales this month`, currency: true },
+    { icon: '📦', label: 'Products', value: products.length, sub: 'Total products', currency: false },
+    { icon: '⚠️', label: 'Low Stock Items', value: lowStock.length, sub: 'Need reorder', currency: false },
+    { icon: '👥', label: 'Customers', value: customers.length, sub: 'Registered', currency: false },
+    { icon: '📊', label: 'Average Sale', value: stats?.averageSale ?? 0, sub: 'Per transaction', currency: true },
   ];
 
   const saleColumns = [
     { title: 'Invoice #', dataIndex: 'invoiceNumber', key: 'invoiceNumber', render: (v: string) => <strong>{v}</strong> },
     { title: 'Date', dataIndex: 'saleDate', key: 'saleDate', render: (v: string) => new Date(v).toLocaleDateString() },
     { title: 'Items', key: 'items', render: (_: unknown, r: any) => r.items?.length || 0 },
-    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => `₹₹{v?.toFixed(2)}` },
+    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => formatINR(v ?? 0) },
     { title: 'Payment', dataIndex: 'paymentMethod', key: 'paymentMethod' },
     {
       title: 'Status',
@@ -218,7 +219,11 @@ const Reports = () => {
               <span className="text-2xl shrink-0">{card.icon}</span>
               <div className="min-w-0">
                 <h3 className="text-xs text-gray-500 font-medium truncate">{card.label}</h3>
-                <Statistic value={card.value} prefix={card.prefix} precision={card.precision} valueStyle={{ fontSize: 18 }} />
+                <Statistic
+                  value={card.value}
+                  formatter={card.currency ? (value) => formatINR(Number(value ?? 0)) : undefined}
+                  valueStyle={{ fontSize: 18 }}
+                />
                 <span className="text-[10px] text-gray-400">{card.sub}</span>
               </div>
             </div>
@@ -240,6 +245,10 @@ const Reports = () => {
               <Empty description="No payment data available" />
             </div>
           )}
+        </Card>
+
+        <Card title="Inventory Overview" className="shadow-md">
+          <Chart option={inventoryOption} height={280} />
         </Card>
 
         <Card title="Sales Trend" className="shadow-md lg:col-span-2">

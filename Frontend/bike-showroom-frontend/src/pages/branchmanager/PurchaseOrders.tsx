@@ -7,6 +7,7 @@ import { useGetSuppliersQuery } from '../../store/slices/suppliersApi';
 import { useGetProductsQuery } from '../../store/slices/productsApi';
 import { useGetBranchesQuery } from '../../store/slices/companiesBranchesApi';
 import { errMsg } from '../../utils/error';
+import { formatINR } from '../../utils/currency';
 
 const { Title } = Typography;
 
@@ -107,7 +108,7 @@ const PurchaseOrders = () => {
     { title: 'Branch', dataIndex: 'branchName', key: 'branchName' },
     { title: 'Date', dataIndex: 'orderDate', key: 'orderDate', render: (v: string) => new Date(v).toLocaleDateString() },
     { title: 'Items', key: 'items', render: (_: unknown, r: OrderRow) => r.items?.length || 0 },
-    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => `₹${v.toFixed(2)}` },
+    { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v: number) => formatINR(v) },
     {
       title: 'Status',
       dataIndex: 'status',

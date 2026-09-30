@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using MongoDB.Bson;
 using BikeShowroomAPI.Data.MongoDB;
 using BikeShowroomAPI.DTOs;
 using BikeShowroomAPI.Models.MongoDB;
@@ -58,11 +59,17 @@ public class SalesService : ISalesService
             .ToListAsync();
 
         // Get related data
-        var customerIds = sales.Select(s => s.CustomerId).Distinct().ToList();
+        var customerIds = sales
+            .Where(s => !string.IsNullOrWhiteSpace(s.CustomerId))
+            .Select(s => s.CustomerId!)
+            .Distinct()
+            .ToList();
         var branchIds = sales.Select(s => s.BranchId).Distinct().ToList();
         var allItemProductIds = sales.SelectMany(s => s.Items.Select(i => i.ProductId)).Distinct().ToList();
 
-        var customers = await _customers.Find(c => customerIds.Contains(c.Id)).ToListAsync();
+        var customers = customerIds.Count == 0
+            ? new List<Customer>()
+            : await _customers.Find(c => customerIds.Contains(c.Id)).ToListAsync();
         var branches = await _branches.Find(b => branchIds.Contains(b.Id)).ToListAsync();
         var products = await _products.Find(p => allItemProductIds.Contains(p.Id)).ToListAsync();
 
@@ -79,7 +86,9 @@ public class SalesService : ISalesService
 
         if (sale == null) return null;
 
-        var customer = await _customers.Find(c => c.Id == sale.CustomerId).FirstOrDefaultAsync();
+        var customer = string.IsNullOrWhiteSpace(sale.CustomerId)
+            ? null
+            : await _customers.Find(c => c.Id == sale.CustomerId).FirstOrDefaultAsync();
         var branch = await _branches.Find(b => b.Id == sale.BranchId).FirstOrDefaultAsync();
 
         var productIds = sale.Items.Select(i => i.ProductId).Distinct().ToList();
@@ -88,8 +97,12 @@ public class SalesService : ISalesService
 
         var customerName = customer != null ? $"{customer.FirstName} {customer.LastName}".Trim() : "";
 
+        var customerNames = customer == null
+            ? new Dictionary<string, string>()
+            : new Dictionary<string, string> { [customer.Id] = customerName };
+
         return ToDto(sale,
-            new Dictionary<string, string> { [sale.CustomerId] = customerName },
+            customerNames,
             new Dictionary<string, string> { [sale.BranchId] = branch?.Name ?? "" },
             productDict);
     }
@@ -105,9 +118,17 @@ public class SalesService : ISalesService
         if (!branchExists)
             return ServiceResult<SaleDTO>.Fail("Branch not found", ServiceResultStatus.NotFound);
 
-        var customerExists = await _customers.Find(c => c.Id == createDto.CustomerId && c.IsActive).AnyAsync();
-        if (!customerExists)
-            return ServiceResult<SaleDTO>.Fail("Customer not found", ServiceResultStatus.NotFound);
+        var customerId = string.IsNullOrWhiteSpace(createDto.CustomerId) ? null : createDto.CustomerId.Trim();
+        if (customerId != null)
+        {
+            if (!ObjectId.TryParse(customerId, out _))
+                return ServiceResult<SaleDTO>.Fail("Customer not found", ServiceResultStatus.NotFound);
+
+            var customerExists = await _customers.Find(c =>
+                c.Id == customerId && c.CompanyId == createDto.CompanyId && c.IsActive).AnyAsync();
+            if (!customerExists)
+                return ServiceResult<SaleDTO>.Fail("Customer not found", ServiceResultStatus.NotFound);
+        }
 
         var saleNumber = $"SL-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
 
@@ -115,7 +136,7 @@ public class SalesService : ISalesService
         {
             CompanyId = createDto.CompanyId,
             BranchId = createDto.BranchId,
-            CustomerId = createDto.CustomerId,
+            CustomerId = customerId,
             SaleNumber = saleNumber,
             SaleDate = DateTime.UtcNow,
             Status = "Completed",
@@ -170,7 +191,9 @@ public class SalesService : ISalesService
 
         await _sales.InsertOneAsync(sale);
 
-        var customer = await _customers.Find(c => c.Id == createDto.CustomerId).FirstOrDefaultAsync();
+        var customer = customerId == null
+            ? null
+            : await _customers.Find(c => c.Id == customerId).FirstOrDefaultAsync();
         var branch = await _branches.Find(b => b.Id == createDto.BranchId).FirstOrDefaultAsync();
         var productIds = sale.Items.Select(i => i.ProductId).Distinct().ToList();
         var products = await _products.Find(p => productIds.Contains(p.Id)).ToListAsync();
@@ -178,8 +201,12 @@ public class SalesService : ISalesService
 
         var customerName = customer != null ? $"{customer.FirstName} {customer.LastName}".Trim() : "";
 
+        var customerNames = customer == null
+            ? new Dictionary<string, string>()
+            : new Dictionary<string, string> { [customer.Id] = customerName };
+
         return ServiceResult<SaleDTO>.Ok(ToDto(sale,
-            new Dictionary<string, string> { [sale.CustomerId] = customerName },
+            customerNames,
             new Dictionary<string, string> { [sale.BranchId] = branch?.Name ?? "" },
             productDict));
     }
@@ -228,7 +255,11 @@ public class SalesService : ISalesService
         Dictionary<string, string> branchDict,
         Dictionary<string, string> productDict)
     {
-        customerDict.TryGetValue(sale.CustomerId, out var customerName);
+        string? customerName;
+        if (sale.CustomerId is not null)
+            customerDict.TryGetValue(sale.CustomerId, out customerName);
+        else
+            customerName = null;
         branchDict.TryGetValue(sale.BranchId, out var branchName);
 
         return new SaleDTO

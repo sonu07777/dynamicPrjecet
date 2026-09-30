@@ -200,10 +200,10 @@ const Navbar = () => {
         </nav>
 
         {/* Spacer */}
-        <div className="flex-1 shrink-0 min-h-0" />
+        {/* <div className="flex-1 shrink-0 min-h-0  border border-red-800"  /> */}
 
         {/* Collapse/Expand Toggle at Bottom */}
-        <div className="px-3 pb-3 shrink-0">
+        <div className="px-3 pb-3 shrink-0 ">
           <Tooltip title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} placement="right" destroyTooltipOnHide>
             <Button
               type="text"

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using MongoDB.Driver;
@@ -78,7 +79,20 @@ builder.Services.AddScoped(sp =>
 builder.Services.AddScoped<MongoDbContext>();
 
 // JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSecureSecretKeyHere_ChangeThisInProduction_MinimumLength32Characters!";
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    if (!builder.Environment.IsDevelopment())
+        throw new InvalidOperationException("Jwt:Key must be configured outside Development.");
+
+    jwtKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
+    builder.Configuration["Jwt:Key"] = jwtKey;
+}
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+    throw new InvalidOperationException("Jwt:Key must contain at least 32 bytes.");
+if (!builder.Environment.IsDevelopment() && IsPlaceholderJwtKey(jwtKey))
+    throw new InvalidOperationException("Jwt:Key must be replaced with a private production secret.");
+
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "BikeShowroomAPI";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "BikeShowroomClient";
 
@@ -101,14 +115,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// CORS
+// CORS origins must be explicitly configured for deployed environments.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+        if (builder.Environment.IsDevelopment())
+            origins = origins.Concat(["http://localhost:3000", "http://localhost:5173"]).Distinct().ToArray();
+
+        policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
     });
 });
 
@@ -125,6 +141,10 @@ builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
 builder.Services.AddScoped<ISalesService, SalesService>();
 builder.Services.AddScoped<IStockTransferService, StockTransferService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddHttpClient<RazorpayClient>(client =>
+{
+    client.BaseAddress = new Uri("https://api.razorpay.com/v1/");
+});
 
 // AuditLogService microservice client
 builder.Services.AddHttpClient<IAuditService, AuditService>(client =>
@@ -136,13 +156,24 @@ builder.Services.AddHttpClient<IAuditService, AuditService>(client =>
 
 var app = builder.Build();
 
+if (!app.Environment.IsDevelopment())
+    app.UseHsts();
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    await next();
+});
+
 // Seed initial data (roles, admin user)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        await SeedData(services);
+        await SeedData(services, app.Environment, builder.Configuration);
     }
     catch (Exception ex)
     {
@@ -166,19 +197,39 @@ app.MapControllers();
 app.Run();
 
 // Seed data for MongoDB
-static async Task SeedData(IServiceProvider services)
+static async Task SeedData(IServiceProvider services, IWebHostEnvironment environment, IConfiguration configuration)
 {
     var context = services.GetRequiredService<MongoDbContext>();
 
     // Ensure indexes are created
     await context.EnsureIndexesAsync();
 
+    if (!environment.IsDevelopment())
+        return;
+
+    var adminPassword = configuration["Seed:AdminPassword"];
+    if (string.IsNullOrWhiteSpace(adminPassword))
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Development admin seed skipped because Seed:AdminPassword is not configured.");
+        return;
+    }
+
     // Check whether the default admin user already exists.
     // Do not skip seeding just because other users exist in the database.
-    var adminExists = await context.Users.CountDocumentsAsync(u =>
-        u.Email == "admin@bikeshowroom.com") > 0;
-    if (adminExists)
+    var existingAdmin = await context.Users
+        .Find(u => u.Email == "admin@bikeshowroom.com")
+        .FirstOrDefaultAsync();
+    if (existingAdmin is not null)
+    {
+        if (!BCrypt.Net.BCrypt.Verify(adminPassword, existingAdmin.PasswordHash ?? string.Empty))
+        {
+            existingAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
+            existingAdmin.SecurityStamp = Guid.NewGuid().ToString();
+            await context.Users.ReplaceOneAsync(user => user.Id == existingAdmin.Id, existingAdmin);
+        }
         return;
+    }
 
     // Create default SuperAdmin user
     var superAdmin = new ApplicationUser
@@ -188,7 +239,7 @@ static async Task SeedData(IServiceProvider services)
         Email = "admin@bikeshowroom.com",
         NormalizedEmail = "ADMIN@BIKESHOWROOM.COM",
         EmailConfirmed = true,
-        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
         SecurityStamp = Guid.NewGuid().ToString(),
         PhoneNumber = "",
         PhoneNumberConfirmed = false,
@@ -206,3 +257,9 @@ static async Task SeedData(IServiceProvider services)
 
     await context.Users.InsertOneAsync(superAdmin);
 }
+
+static bool IsPlaceholderJwtKey(string key) =>
+    key.StartsWith("your", StringComparison.OrdinalIgnoreCase) ||
+    key.Contains("changethis", StringComparison.OrdinalIgnoreCase) ||
+    key.Contains("placeholder", StringComparison.OrdinalIgnoreCase) ||
+    key.Contains("replace-me", StringComparison.OrdinalIgnoreCase);

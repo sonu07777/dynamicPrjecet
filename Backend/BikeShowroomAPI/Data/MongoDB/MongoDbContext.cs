@@ -31,6 +31,8 @@ public class MongoDbContext
     public IMongoCollection<PurchaseOrder> PurchaseOrders => _database.GetCollection<PurchaseOrder>("purchaseOrders");
     public IMongoCollection<StockTransfer> StockTransfers => _database.GetCollection<StockTransfer>("stockTransfers");
     public IMongoCollection<ApplicationUser> Users => _database.GetCollection<ApplicationUser>("users");
+    public IMongoCollection<SubscriptionPlan> SubscriptionPlans => _database.GetCollection<SubscriptionPlan>("subscriptionPlans");
+    public IMongoCollection<CompanySubscription> CompanySubscriptions => _database.GetCollection<CompanySubscription>("companySubscriptions");
 
     public async Task EnsureIndexesAsync()
     {
@@ -122,5 +124,13 @@ public class MongoDbContext
             Builders<ApplicationUser>.IndexKeys.Ascending(u => u.CompanyId)));
         await Users.Indexes.CreateOneAsync(new CreateIndexModel<ApplicationUser>(
             Builders<ApplicationUser>.IndexKeys.Ascending(u => u.BranchId)));
+
+        await SubscriptionPlans.Indexes.CreateOneAsync(new CreateIndexModel<SubscriptionPlan>(
+            Builders<SubscriptionPlan>.IndexKeys.Ascending(p => p.IsActive)));
+        await CompanySubscriptions.Indexes.CreateOneAsync(new CreateIndexModel<CompanySubscription>(
+            Builders<CompanySubscription>.IndexKeys.Ascending(s => s.RazorpaySubscriptionId),
+            new CreateIndexOptions { Unique = true }));
+        await CompanySubscriptions.Indexes.CreateOneAsync(new CreateIndexModel<CompanySubscription>(
+            Builders<CompanySubscription>.IndexKeys.Ascending(s => s.CompanyId).Descending(s => s.CreatedAt)));
     }
 }

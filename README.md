@@ -130,11 +130,23 @@ npm run dev
 
 Frontend runs at: `http://localhost:5173`
 
-## 🔐 Default Login Credentials
+## 🔐 Secrets and Payments
 
-**Super Admin Account:**
-- Email: `admin@bikeshowroom.com`
-- Password: `Admin@123`
+Do not store JWT or Razorpay secrets in tracked `appsettings` files. Configure local development values with .NET User Secrets, or provide environment variables in deployment:
+
+```bash
+cd Backend/BikeShowroomAPI
+dotnet user-secrets init
+dotnet user-secrets set "Jwt:Key" "<private-random-secret-at-least-32-bytes>"
+dotnet user-secrets set "Seed:AdminPassword" "<strong-development-only-password>"
+dotnet user-secrets set "Razorpay:KeyId" "<razorpay-key-id>"
+dotnet user-secrets set "Razorpay:KeySecret" "<razorpay-key-secret>"
+dotnet user-secrets set "Razorpay:WebhookSecret" "<razorpay-webhook-secret>"
+```
+
+The development SuperAdmin seed is skipped unless `Seed:AdminPassword` is configured. When set, that value also replaces the password of an existing development seed account, so an old default password is not retained. Production does not seed a default administrator and requires a private JWT key of at least 32 bytes. Set `Cors:AllowedOrigins` to the exact deployed frontend origins (for environment variables, use `Cors__AllowedOrigins__0`).
+
+Razorpay package creation and checkout require all three Razorpay values. Configure the Razorpay webhook URL as `/api/subscriptions/webhook` and subscribe it to subscription lifecycle events. Package prices are created and stored by the API in INR; the browser never supplies a charge amount.
 
 ## 📚 API Documentation
 
@@ -144,7 +156,7 @@ Frontend runs at: `http://localhost:5173`
 ```json
 {
   "email": "admin@bikeshowroom.com",
-  "password": "Admin@123"
+  "password": "the-development-password-you-configured"
 }
 ```
 

@@ -3,7 +3,7 @@ import type { Customer, CreateCustomer } from '../../types';
 
 export const customersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getCustomers: builder.query<Customer[], { companyId?: number; searchQuery?: string }>({
+    getCustomers: builder.query<Customer[], { companyId?: string; searchQuery?: string }>({
       query: (params) => ({
         url: params.searchQuery ? '/customers/search' : '/customers',
         params: { companyId: params.companyId, query: params.searchQuery },
@@ -13,20 +13,20 @@ export const customersApi = apiSlice.injectEndpoints({
           ? [...result.map(({ id }) => ({ type: 'Customer' as const, id })), { type: 'Customer', id: 'LIST' }]
           : [{ type: 'Customer', id: 'LIST' }],
     }),
-    getCustomer: builder.query<Customer, number>({
-      query: (id) => ({ url: `/customers/${id}` }),
+    getCustomer: builder.query<Customer, string>({
+      query: (id) => ({ url: `/customers/${encodeURIComponent(id)}` }),
       providesTags: (_result, _error, id) => [{ type: 'Customer', id }],
     }),
     createCustomer: builder.mutation<Customer, CreateCustomer>({
       query: (data) => ({ url: '/customers', method: 'POST', data }),
       invalidatesTags: [{ type: 'Customer', id: 'LIST' }],
     }),
-    updateCustomer: builder.mutation<void, { id: number } & Partial<CreateCustomer>>({
-      query: ({ id, ...data }) => ({ url: `/customers/${id}`, method: 'PUT', data }),
+    updateCustomer: builder.mutation<void, { id: string } & Partial<CreateCustomer>>({
+      query: ({ id, ...data }) => ({ url: `/customers/${encodeURIComponent(id)}`, method: 'PUT', data }),
       invalidatesTags: (_result, _error, { id }) => [{ type: 'Customer', id }, { type: 'Customer', id: 'LIST' }],
     }),
-    deleteCustomer: builder.mutation<void, number>({
-      query: (id) => ({ url: `/customers/${id}`, method: 'DELETE' }),
+    deleteCustomer: builder.mutation<void, string>({
+      query: (id) => ({ url: `/customers/${encodeURIComponent(id)}`, method: 'DELETE' }),
       invalidatesTags: [{ type: 'Customer', id: 'LIST' }],
     }),
   }),

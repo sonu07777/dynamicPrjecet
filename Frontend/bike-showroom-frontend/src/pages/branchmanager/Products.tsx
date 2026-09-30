@@ -11,6 +11,7 @@ import {
   useDeleteProductMutation,
 } from '../../store/slices/productsApi';
 import { errMsg } from '../../utils/error';
+import { formatINR } from '../../utils/currency';
 
 const { Title } = Typography;
 
@@ -153,8 +154,8 @@ const Products = () => {
     { title: 'SKU', dataIndex: 'sku', key: 'sku', render: (v: string) => <strong>{v}</strong> },
     { title: 'Name', dataIndex: 'name', key: 'name' },
     { title: 'Category', dataIndex: 'categoryName', key: 'categoryName' },
-    { title: 'Cost Price', dataIndex: 'costPrice', key: 'costPrice', render: (v: number) => `₹${v.toFixed(2)}` },
-    { title: 'Sell Price', dataIndex: 'sellingPrice', key: 'sellingPrice', render: (v: number) => `₹${v.toFixed(2)}` },
+    { title: 'Cost Price', dataIndex: 'costPrice', key: 'costPrice', render: (v: number) => formatINR(v) },
+    { title: 'Sell Price', dataIndex: 'sellingPrice', key: 'sellingPrice', render: (v: number) => formatINR(v) },
     { title: 'Unit', dataIndex: 'unit', key: 'unit' },
     {
       title: 'Actions',

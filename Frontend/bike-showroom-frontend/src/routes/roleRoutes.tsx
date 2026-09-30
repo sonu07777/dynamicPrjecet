@@ -13,6 +13,7 @@ import Suppliers from '../pages/branchmanager/Suppliers';
 import PurchaseOrders from '../pages/branchmanager/PurchaseOrders';
 import StockTransfers from '../pages/branchmanager/StockTransfers';
 import Reports from '../pages/branchmanager/Reports';
+import Subscription from '../pages/companyadmin/Subscription';
 
 export interface RoleRoute {
   path: string;
@@ -39,4 +40,5 @@ export const roleRoutes: RoleRoute[] = [
   { path: '/reports', label: 'Reports', element: <Reports />, roles: ['SuperAdmin', 'CompanyAdmin', 'BranchManager'] },
   { path: '/users', label: 'Users', element: <UserManagement />, roles: ['SuperAdmin', 'CompanyAdmin'] },
   { path: '/audit-logs', label: 'Audit Logs', element: <AuditLogs />, roles: ['SuperAdmin', 'CompanyAdmin'] },
+  { path: '/subscription', label: 'Subscriptions', element: <Subscription />, roles: ['SuperAdmin', 'CompanyAdmin'] },
 ];

@@ -5,6 +5,7 @@ import { useGetSalesStatsQuery } from '../../store/slices/salesApi';
 import { useGetProductsQuery } from '../../store/slices/productsApi';
 import { useGetCustomersQuery } from '../../store/slices/customersApi';
 import { useGetLowStockItemsQuery } from '../../store/slices/inventoryApi';
+import { formatINR, formatIndianNumber } from '../../utils/currency';
 
 const { Title, Text } = Typography;
 
@@ -39,9 +40,8 @@ const Dashboard = () => {
           <Statistic
             title="Today's Sales"
             value={stats?.todayRevenue ?? 0}
-            precision={2}
-            prefix="₹"
-            suffix={<Text type="secondary" style={{ fontSize: 12 }}> / {stats?.todaySales || 0} transactions</Text>}
+            formatter={(value) => formatINR(Number(value ?? 0))}
+            suffix={<Text type="secondary" style={{ fontSize: 12 }}> / {formatIndianNumber(stats?.todaySales || 0)} transactions</Text>}
           />
         </Card>
         <Card size="small" className="shadow-md">
@@ -81,8 +81,8 @@ const Dashboard = () => {
         <Card title="Monthly Overview" className="shadow-md">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <Statistic title="Monthly Sales" value={stats?.monthSales ?? 0} />
-            <Statistic title="Monthly Revenue" value={stats?.monthRevenue ?? 0} precision={2} prefix="₹" />
-            <Statistic title="Average Sale" value={stats?.averageSale ?? 0} precision={2} prefix="₹" />
+            <Statistic title="Monthly Revenue" value={stats?.monthRevenue ?? 0} formatter={(value) => formatINR(Number(value ?? 0))} />
+            <Statistic title="Average Sale" value={stats?.averageSale ?? 0} formatter={(value) => formatINR(Number(value ?? 0))} />
           </div>
         </Card>
       </div>

@@ -5,6 +5,7 @@ import { useAppSelector } from '../../store/hooks';
 import { useGetProductsQuery } from '../../store/slices/productsApi';
 import { useCreateSaleMutation } from '../../store/slices/salesApi';
 import { errMsg } from '../../utils/error';
+import { formatINR } from '../../utils/currency';
 import type { Product } from '../../types';
 
 interface CartItem { product: Product; quantity: number; discount: number }
@@ -63,7 +64,7 @@ const POS = () => {
         notes: customerName ? `Customer: ${customerName}` : null,
         items: cart.map((i) => ({ productId: i.product.id, quantity: i.quantity, unitPrice: i.product.sellingPrice, discount: i.discount, totalPrice: i.product.sellingPrice * i.quantity - i.discount }))
       }).unwrap();
-      message.success(`Sale completed! Change: ₹₹{change().toFixed(2)}`);
+      message.success(`Sale completed! Change: ${formatINR(change())}`);
       setCart([]); setCustomerName(''); setAmountReceived(0); setSearchQuery('');
     } catch (err: any) {
       console.error('Sale failed:', err);
@@ -89,7 +90,7 @@ const POS = () => {
                 className="bg-gray-50 border-2 border-gray-200 rounded-xl p-3 sm:p-4 cursor-pointer transition-all hover:border-primary hover:-translate-y-1 hover:shadow-lg">
                 <h4 className="text-xs sm:text-sm font-semibold text-gray-800 truncate mb-1">{p.name}</h4>
                 <p className="text-xs text-gray-400 mb-1 truncate">{p.sku}</p>
-                <p className="text-base sm:text-lg font-bold text-primary">₹{p.sellingPrice.toFixed(2)}</p>
+                <p className="text-base sm:text-lg font-bold text-primary">{formatINR(p.sellingPrice)}</p>
               </div>
             ))}
           </div>
@@ -113,7 +114,7 @@ const POS = () => {
                 <div key={i.product.id} className="bg-white rounded-xl p-3 flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold truncate">{i.product.name}</h4>
-                    <p className="text-xs text-gray-500">₹{i.product.sellingPrice.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500">{formatINR(i.product.sellingPrice)}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <Button size="small" icon={<MinusOutlined />} onClick={() => updateQuantity(i.product.id, i.quantity - 1)} />
@@ -127,7 +128,7 @@ const POS = () => {
                     <Button size="small" icon={<PlusOutlined />} onClick={() => updateQuantity(i.product.id, i.quantity + 1)} />
                   </div>
                   <div className="font-bold text-sm min-w-[70px] text-right">
-                    ₹{(i.product.sellingPrice * i.quantity - i.discount).toFixed(2)}
+                    {formatINR(i.product.sellingPrice * i.quantity - i.discount)}
                   </div>
                   <Button size="small" danger icon={<DeleteOutlined />} onClick={() => removeFromCart(i.product.id)} />
                 </div>
@@ -135,11 +136,11 @@ const POS = () => {
             </div>
 
             <div className="bg-white rounded-xl p-4 space-y-2 text-sm mb-4">
-              <div className="flex justify-between"><span>Subtotal:</span><span>₹{subTotal().toFixed(2)}</span></div>
-              <div className="flex justify-between"><span>Discount:</span><span>-₹{discount().toFixed(2)}</span></div>
-              <div className="flex justify-between"><span>Tax (10%):</span><span>₹{tax().toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Subtotal:</span><span>{formatINR(subTotal())}</span></div>
+              <div className="flex justify-between"><span>Discount:</span><span>-{formatINR(discount())}</span></div>
+              <div className="flex justify-between"><span>Tax (10%):</span><span>{formatINR(tax())}</span></div>
               <div className="flex justify-between font-bold text-lg text-primary border-t-2 border-primary pt-3 mt-2">
-                <span>Total:</span><span>₹{total().toFixed(2)}</span>
+                <span>Total:</span><span>{formatINR(total())}</span>
               </div>
             </div>
 
@@ -150,7 +151,7 @@ const POS = () => {
                   style={{ width: '100%' }}
                   value={paymentMethod}
                   onChange={setPaymentMethod}
-                  options={['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer'].map((m) => ({ label: m, value: m }))}
+                  options={['Cash', 'UPI', 'Credit Card', 'Debit Card', 'Bank Transfer'].map((m) => ({ label: m, value: m }))}
                 />
               </div>
               {paymentMethod === 'Cash' && (
@@ -168,7 +169,7 @@ const POS = () => {
                     />
                   </div>
                   <div className="flex justify-between p-3 bg-green-50 rounded-xl font-semibold text-sm">
-                    <span>Change:</span><span className="text-green-700 text-lg">₹{change().toFixed(2)}</span>
+                    <span>Change:</span><span className="text-green-700 text-lg">{formatINR(change())}</span>
                   </div>
                 </>
               )}
